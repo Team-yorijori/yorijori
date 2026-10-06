@@ -1,0 +1,23 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 애니메이션 (v7) — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* ---------- v7: 애니메이션 ---------- */
+.anim-btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.14);color:var(--bar-ink);font-size:13px;white-space:nowrap}
+.anim-btn svg{width:16px;height:16px}
+.anim-btn[aria-pressed="false"]{opacity:.6}
+.anim-btn[aria-pressed="false"] svg{opacity:.5}
+@container app (max-width:380px){ .anim-btn span{display:none} .anim-btn{padding:8px} }
+/* 요리 → 먹기 */
+.anim-stage{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(30,18,12,.5);cursor:pointer;padding:16px}
+.anim-card{width:min(280px,100%);background:var(--bg);border:1px solid var(--card-line);border-radius:24px;padding:14px 14px 16px;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center}
+.anim-card svg{width:100%;height:auto;display:block}
+.anim-card svg *{transform-box:fill-box;transform-origin:center}
+.anim-cap{font-size:15px;min-height:24px;margin-top:2px}
+.anim-skip{font-size:12px;color:var(--muted);margin-top:2px}
+/* 쓰레기통 */
+.fly-chip{position:fixed;z-index:95;pointer-events:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--shadow);font-size:14px;color:var(--ink);white-space:nowrap;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.fly-chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.trash{position:fixed;z-index:94;pointer-events:none;width:76px;height:92px}
+.trash svg{width:100%;height:100%;overflow:visible}
+.trash .lid{transform-box:fill-box;transform-origin:0% 100%}
+.trash-cap{position:fixed;z-index:94;pointer-events:none;font-size:12px;color:var(--bar-ink);background:var(--bar);padding:3px 10px;border-radius:999px;white-space:nowrap}

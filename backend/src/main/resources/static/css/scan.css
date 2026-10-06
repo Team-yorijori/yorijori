@@ -1,0 +1,28 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 재료 사진 스캔 창 (v3·v5) — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* ---------- v3: 실제 스캔 ---------- */
+.scan-stage{margin-top:12px;border-radius:12px;overflow:hidden;background:var(--field)}
+.scan-stage canvas{display:block;width:100%;height:auto}
+.scan-status{margin-top:10px;font-size:13px;color:var(--muted);min-height:20px}
+.scan-status.err{color:var(--danger)}
+.scan-list{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px}
+.scan-list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--field)}
+.scan-list .sw{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px}
+.scan-list input[type=text]{background:var(--bg);border:0;border-radius:8px;padding:6px 8px;width:100%;min-width:0}
+.scan-list .qty{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.scan-list .qty input{width:56px;background:var(--bg);border:0;border-radius:8px;padding:6px 6px;font-variant-numeric:tabular-nums}
+.scan-recs{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.scan-recs button{width:100%;text-align:left;border:1px solid var(--card-line);background:var(--card);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.scan-list li[data-row]{grid-template-columns:auto minmax(0,1fr) 108px 132px}
+.scan-list .tagcell{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.scan-list .row-x{border:0;background:transparent;color:var(--muted);font-size:18px;line-height:1;width:26px;height:26px;border-radius:8px;cursor:pointer}
+.scan-list .row-x:hover{background:var(--bg);color:var(--danger)}
+.scan-list li.scan-sep{display:block;background:transparent;padding:10px 2px 2px;font-size:13px;color:var(--muted)}
+.scan-list li.flash{animation:rowflash .7s ease}
+@keyframes rowflash{from{box-shadow:0 0 0 2px var(--accent, #4E9A3F)}to{box-shadow:0 0 0 2px transparent}}
+.scan-add{margin-top:12px}
+.scan-add .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.scan-add .chip{border:1px solid var(--card-line);background:var(--card);color:inherit;border-radius:999px;padding:6px 11px;font-size:13px;cursor:pointer}
+.scan-add .chip:hover{background:var(--field)}
+@container app (max-width:640px){ .scan-list li, .scan-list li[data-row]{grid-template-columns:auto minmax(0,1fr) auto} .scan-list .tagcell{grid-column:2 / -1} }

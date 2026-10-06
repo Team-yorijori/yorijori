@@ -1,0 +1,26 @@
+# 빌드
+backend/.gradle/
+backend/build/
+backend/out/
+backend/bin/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 비밀 값 — 절대 올리지 않는다
+backend/src/main/resources/application-secret.yml
+.env
+
+# 학습 데이터 원본·결과 (용량·라이선스. AI Hub 원본은 재배포 금지)
+ai/train/datasets/
+ai/train/runs/
+ai/train/qc_out/
+*.zip
+*.pt
+
+# 로그
+*.log

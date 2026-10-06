@@ -1,0 +1,24 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 장보기 (v6) — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* 장보기 */
+.cart-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+.cart-list li{background:var(--tint-surface);border-radius:14px;padding:12px 14px;display:grid;gap:10px}
+.cart-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.cart-top b{font-weight:400;font-size:17px}
+.cart-shops{display:flex;flex-wrap:wrap;gap:6px}
+.shop{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:var(--card);border:1px solid var(--card-line);color:var(--ink);text-decoration:none;font-size:13px}
+.shop i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.shop:hover{background:var(--field)}
+.cart-bottom{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.cart-bottom label{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.cart-bottom input[type=number]{width:96px;background:var(--bg);border:0;border-radius:8px;padding:6px 8px;font-variant-numeric:tabular-nums}
+.cart-top .x{margin-left:auto;background:none;border:0;color:var(--muted);font-size:18px;width:28px;height:28px;border-radius:8px}
+.cart-top .x:hover{background:var(--bg);color:var(--danger)}
+.cart-how{margin:14px 0;font-size:14px}
+.cart-add .date{width:170px}
+@container app (max-width:640px){
+  .item-search{max-width:none;width:100%;order:3}
+  .cart-add .date{width:100%}
+  .ed-grid{grid-template-columns:minmax(0,1fr)}
+}

@@ -1,0 +1,35 @@
+<!-- PC/모바일 미리보기 (데모 발표용 도구). 실제 서비스에서 빼려면 index.html 에서 이 두 조각을 지운다 [프론트] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+<th:block th:fragment="grips">
+<div class="grip grip-l" data-side="-1" role="slider" tabindex="0" aria-label="화면 폭 조절(왼쪽)"><i></i></div>
+<div class="grip grip-r" data-side="1" role="slider" tabindex="0" aria-label="화면 폭 조절(오른쪽)"><i></i></div>
+<div class="grip grip-b" data-axis="h" role="slider" tabindex="0" aria-label="화면 높이 조절"><i></i></div>
+</th:block>
+
+<th:block th:fragment="panel">
+<div class="size-panel" id="sizePanel" aria-label="미리보기 화면 크기">
+  <div class="size-read"><b id="sizeVal">390 × 844</b><span id="sizeKind">모바일</span></div>
+  <input type="range" id="sizeRange" min="320" max="1280" step="1" value="390" aria-label="화면 폭">
+  <div class="size-presets" id="sizePresets">
+    <button data-w="360" data-h="780">360<small>작은 폰</small></button>
+    <button data-w="390" data-h="844">390<small>아이폰</small></button>
+    <button data-w="430" data-h="932">430<small>큰 폰</small></button>
+    <button data-w="768" data-h="1024">768<small>태블릿</small></button>
+    <button data-w="1024" data-h="768">1024<small>노트북</small></button>
+    <button data-w="1280" data-h="800">1280<small>PC</small></button>
+  </div>
+  <div class="note">양옆 손잡이는 폭, 아래 손잡이는 높이. 아래 손잡이를 두 번 누르면 높이 자동.</div>
+</div>
+
+<button class="view-toggle" id="viewToggle" aria-pressed="false" type="button">
+  <span class="ico" aria-hidden="true">
+    <svg class="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+    <svg class="i-pc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></svg>
+  </span>
+  <span id="viewLabel">모바일로 보기</span>
+</button>
+</th:block>
+</body>
+</html>

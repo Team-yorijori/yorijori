@@ -1,0 +1,115 @@
+erDiagram
+  USERS ||--o{ FRIDGE_SCANS : uploads
+  USERS ||--o{ FRIDGE_ITEMS : owns
+  USERS ||--o{ USER_ALLERGIES : has
+  USERS ||--o{ BOOKMARKS : saves
+  USERS ||--o{ REVIEWS : writes
+  FRIDGE_SCANS ||--o{ DETECTED_INGREDIENTS : detects
+  FRIDGE_SCANS ||--o{ RECOMMENDATIONS : produces
+  INGREDIENT_CATEGORIES ||--o{ INGREDIENTS : groups
+  INGREDIENTS ||--o{ INGREDIENT_ALIASES : "known as"
+  INGREDIENTS ||--o{ DETECTED_INGREDIENTS : "matched to"
+  INGREDIENTS ||--o{ FRIDGE_ITEMS : "stocked as"
+  INGREDIENTS ||--o{ RECIPE_INGREDIENTS : "used in"
+  INGREDIENTS ||--o{ USER_ALLERGIES : excludes
+  RECIPES ||--o{ RECIPE_INGREDIENTS : requires
+  RECIPES ||--o{ RECIPE_STEPS : "consists of"
+  RECIPES ||--o{ RECOMMENDATIONS : "recommended in"
+  RECIPES ||--o{ BOOKMARKS : "saved in"
+  RECIPES ||--o{ REVIEWS : receives
+  USERS {
+    bigint user_id PK
+    varchar email UK
+    varchar password_hash
+    varchar nickname
+    datetime created_at
+  }
+  FRIDGE_SCANS {
+    bigint scan_id PK
+    bigint user_id FK
+    varchar image_url
+    varchar status
+    varchar model_version
+    datetime scanned_at
+  }
+  DETECTED_INGREDIENTS {
+    bigint detection_id PK
+    bigint scan_id FK
+    bigint ingredient_id FK
+    varchar raw_label
+    decimal confidence
+    json bbox
+    boolean is_confirmed
+  }
+  FRIDGE_ITEMS {
+    bigint item_id PK
+    bigint user_id FK
+    bigint ingredient_id FK
+    decimal quantity
+    varchar unit
+    date expires_at
+    datetime updated_at
+  }
+  INGREDIENT_CATEGORIES {
+    int category_id PK
+    varchar name
+  }
+  INGREDIENTS {
+    bigint ingredient_id PK
+    int category_id FK
+    varchar name UK
+    varchar default_unit
+    int shelf_life_days
+  }
+  INGREDIENT_ALIASES {
+    bigint alias_id PK
+    bigint ingredient_id FK
+    varchar alias UK
+  }
+  USER_ALLERGIES {
+    bigint user_id PK,FK
+    bigint ingredient_id PK,FK
+  }
+  RECIPES {
+    bigint recipe_id PK
+    varchar title
+    text description
+    int cook_time_min
+    varchar difficulty
+    int servings
+    varchar image_url
+  }
+  RECIPE_INGREDIENTS {
+    bigint recipe_id PK,FK
+    bigint ingredient_id PK,FK
+    decimal amount
+    varchar unit
+    boolean is_optional
+  }
+  RECIPE_STEPS {
+    bigint step_id PK
+    bigint recipe_id FK
+    int step_no
+    text content
+  }
+  RECOMMENDATIONS {
+    bigint rec_id PK
+    bigint scan_id FK
+    bigint recipe_id FK
+    decimal match_score
+    int missing_count
+    int rank_no
+  }
+  BOOKMARKS {
+    bigint user_id PK,FK
+    bigint recipe_id PK,FK
+    datetime created_at
+  }
+  REVIEWS {
+    bigint review_id PK
+    bigint user_id FK
+    bigint recipe_id FK
+    tinyint rating
+    text comment
+    datetime created_at
+  }

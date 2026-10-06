@@ -1,0 +1,11 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 초성 자동완성 (v6) · 재료 분량 줄바꿈 수정 — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* ---------- v6 ---------- */
+/* 레시피 재료 분량: 글자 단위로 쪼개지던 줄바꿈 수정 */
+.ing .amt{overflow-wrap:normal;word-break:keep-all;max-width:12em}
+/* 초성 자동완성 */
+.ac{position:fixed;z-index:80;list-style:none;margin:0;padding:6px;max-height:264px;overflow:auto;background:var(--bg);border:1px solid var(--card-line);border-radius:12px;box-shadow:0 12px 32px rgba(30,18,12,.22)}
+.ac li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px}
+.ac li:hover,.ac li[aria-selected="true"]{background:var(--field)}
+.ac mark{background:none;color:var(--accent-strong)}

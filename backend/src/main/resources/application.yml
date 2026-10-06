@@ -1,0 +1,61 @@
+# 요리조리 공통 설정
+# 실행: ./gradlew bootRun                      → local 프로필 (H2 메모리 DB, 설치 필요 없음)
+#       ./gradlew bootRun --args='--spring.profiles.active=mysql'   → MySQL
+spring:
+  application:
+    name: yorijori
+  profiles:
+    default: local
+  config:
+    # API 키·DB 비밀번호는 application-secret.yml (깃에 올리지 않는다, example 파일 참고)
+    import: optional:classpath:application-secret.yml
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none          # 스키마는 Flyway(db/migration)가 관리한다
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  thymeleaf:
+    cache: false
+  jackson:
+    time-zone: Asia/Seoul
+    serialization:
+      write-dates-as-timestamps: false
+  servlet:
+    multipart:
+      enabled: false          # 사진은 서버로 올리지 않는다 (브라우저에서 인식)
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+yorijori:
+  scan:
+    model-version: v4
+    model-url: /models/fridge.onnx
+    classes-url: /models/classes.json
+  naver:
+    enabled: false
+    client-id: ${NAVER_CLIENT_ID:}
+    client-secret: ${NAVER_CLIENT_SECRET:}
+    price-cron: "0 0 9,13,19 * * *"
+  youtube:
+    enabled: false
+    api-key: ${YOUTUBE_API_KEY:}
+    daily-limit: 90
+    collect-cron: "0 30 4 * * *"
+
+logging:
+  level:
+    com.yorijori: INFO

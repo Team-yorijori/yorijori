@@ -1,0 +1,195 @@
+erDiagram
+  INGREDIENT {
+    bigint id PK
+    varchar name
+    varchar category "채소 · 과일 · 육류 · 해산물 · 유제품·알 · 가공식품 · 반찬 ·"
+    int fridge_days "냉장 보관 일수 (소비기한 자동 안내, 참고용)"
+    varchar unit
+    double default_qty
+    varchar color "접시 그림 색"
+    int each_gram "영수증 무게 → 개수 환산 (1개당 g)"
+  }
+  INGREDIENT_ALIAS {
+    bigint id PK
+    bigint ingredient_id FK
+    varchar alias
+    varchar source "SYNONYM · RECEIPT"
+  }
+  AVOID_GROUP {
+    bigint id PK
+    varchar name
+    int sort_no
+    varchar warning
+  }
+  AVOID_GROUP_TERM {
+    bigint group_id PK
+    int sort_no PK
+    varchar term
+  }
+  RECIPE {
+    bigint id PK
+    varchar code "화면에서 쓰는 id (r1, kimchi-rice …)"
+    varchar title
+    varchar description
+    int cook_time_min
+    varchar difficulty "초보환영 · 보통 · 어려움 · 쉬움"
+    int servings
+    varchar category "밥 · 국 · 찌개/전골/스튜 · 볶음 …"
+    varchar cuisine "한식 · 서양 · 중국 · 일본 …"
+    varchar kcal
+    varchar source
+    varchar video_id "YouTube 대표 영상 (YoutubeVideoCollector)"
+    int storage_days "만든 요리 냉장 보관 일수 (참고용)"
+    varchar image_url
+  }
+  RECIPE_INGREDIENT {
+    bigint id PK
+    bigint recipe_id FK
+    bigint ingredient_id FK "기준표에 있으면 연결"
+    varchar ingredient_name "표준 재료명. 냉장고 재료와 이 이름으로 매칭"
+    double amount "냉장고 단위 수량 (차감 기본값)"
+    varchar amount_text "원래 표기 (양지머리 100g)"
+    varchar ingredient_type "MAIN · SUB · SEASONING"
+    boolean is_optional
+    int sort_no
+  }
+  RECIPE_STEP {
+    bigint id PK
+    bigint recipe_id FK
+    int step_no
+    varchar content
+  }
+  SCAN_CLASS {
+    bigint id PK
+    varchar model_version "v3 · v4"
+    int class_id "모델 출력 classId"
+    varchar en_name
+    bigint ingredient_id FK
+    double auto_threshold "이 점수 이상이면 자동 체크"
+    varchar confuse_with "혹시 ○○? 버튼 (쉼표 구분)"
+    double map50 "검증 mAP50 (참고)"
+  }
+  USERS {
+    bigint id PK
+    varchar email
+    varchar password_hash
+    varchar nickname
+    varchar role
+    boolean avoid_show "v9 못 먹는 재료: 빼지 않고 표시만"
+    boolean anim_on "v7 애니메이션"
+    datetime created_at
+  }
+  USER_AVOID {
+    bigint id PK
+    bigint user_id FK
+    varchar kind
+    varchar avoid_value
+  }
+  FRIDGE {
+    bigint id PK
+    varchar name
+    datetime created_at
+  }
+  FRIDGE_MEMBER {
+    bigint id PK
+    bigint fridge_id FK
+    bigint user_id FK
+    varchar role "OWNER · MEMBER"
+  }
+  FRIDGE_ITEM {
+    bigint id PK
+    bigint fridge_id FK
+    bigint ingredient_id FK
+    varchar name
+    double qty
+    varchar unit
+    date reg_date
+    date exp_date
+    boolean exp_auto "TRUE: 보관 일수로 계산한 참고용 날짜"
+    varchar source "MANUAL · SCAN · RECEIPT · CART"
+    datetime created_at
+  }
+  DISH {
+    bigint id PK
+    bigint fridge_id FK
+    bigint recipe_id FK
+    varchar recipe_code
+    varchar name
+    int servings
+    int servings_left
+    date made_date
+    date exp_date
+    varchar colors
+    varchar saved_names "이 요리로 살린 임박 재료"
+    datetime created_at
+  }
+  CART_ITEM {
+    bigint id PK
+    bigint user_id FK
+    bigint ingredient_id FK
+    varchar name
+    int target_price
+    boolean notify
+    int lowest_price
+    varchar lowest_shop
+    varchar lowest_url
+    datetime lowest_checked_at
+    int notified_price
+    datetime created_at
+  }
+  COOKING_LOG {
+    bigint id PK
+    bigint user_id FK
+    varchar kind
+    varchar recipe_code
+    bigint dish_id
+    varchar name
+    double amount "인분 또는 재료 수량"
+    varchar saved_names
+    date log_date
+    datetime created_at
+  }
+  COOKING_LOG_INGREDIENT {
+    bigint id PK
+    bigint log_id FK
+    varchar ingredient_name
+    double qty
+    bigint days_left "그때 남은 소비기한 일수"
+  }
+  PRICE_HISTORY {
+    bigint id PK
+    varchar ingredient_name
+    varchar channel
+    varchar mall_name
+    int price
+    varchar product_title
+    varchar product_url
+    datetime checked_at
+  }
+  SCAN_FEEDBACK {
+    bigint id PK
+    bigint user_id
+    varchar model_version
+    varchar predicted
+    varchar corrected
+    double score
+    boolean consent
+    datetime created_at
+  }
+  INGREDIENT ||--o{ INGREDIENT_ALIAS : "ingredient_id"
+  AVOID_GROUP ||--o{ AVOID_GROUP_TERM : "group_id"
+  RECIPE ||--o{ RECIPE_INGREDIENT : "recipe_id"
+  INGREDIENT ||--o{ RECIPE_INGREDIENT : "ingredient_id"
+  RECIPE ||--o{ RECIPE_STEP : "recipe_id"
+  INGREDIENT ||--o{ SCAN_CLASS : "ingredient_id"
+  USERS ||--o{ USER_AVOID : "user_id"
+  FRIDGE ||--o{ FRIDGE_MEMBER : "fridge_id"
+  USERS ||--o{ FRIDGE_MEMBER : "user_id"
+  FRIDGE ||--o{ FRIDGE_ITEM : "fridge_id"
+  INGREDIENT ||--o{ FRIDGE_ITEM : "ingredient_id"
+  FRIDGE ||--o{ DISH : "fridge_id"
+  RECIPE ||--o{ DISH : "recipe_id"
+  USERS ||--o{ CART_ITEM : "user_id"
+  INGREDIENT ||--o{ CART_ITEM : "ingredient_id"
+  USERS ||--o{ COOKING_LOG : "user_id"
+  COOKING_LOG ||--o{ COOKING_LOG_INGREDIENT : "log_id"

@@ -1,0 +1,167 @@
+[
+ {
+  "id": 0,
+  "en": "cabbage",
+  "ko": "양배추"
+ },
+ {
+  "id": 1,
+  "en": "green_onion",
+  "ko": "대파"
+ },
+ {
+  "id": 2,
+  "en": "onion",
+  "ko": "양파"
+ },
+ {
+  "id": 3,
+  "en": "potato",
+  "ko": "감자"
+ },
+ {
+  "id": 4,
+  "en": "carrot",
+  "ko": "당근"
+ },
+ {
+  "id": 5,
+  "en": "zucchini",
+  "ko": "애호박"
+ },
+ {
+  "id": 6,
+  "en": "cucumber",
+  "ko": "오이"
+ },
+ {
+  "id": 7,
+  "en": "radish",
+  "ko": "무"
+ },
+ {
+  "id": 8,
+  "en": "spinach",
+  "ko": "시금치"
+ },
+ {
+  "id": 9,
+  "en": "mushroom",
+  "ko": "버섯"
+ },
+ {
+  "id": 10,
+  "en": "tomato",
+  "ko": "토마토"
+ },
+ {
+  "id": 11,
+  "en": "chili_pepper",
+  "ko": "고추"
+ },
+ {
+  "id": 12,
+  "en": "garlic",
+  "ko": "마늘"
+ },
+ {
+  "id": 13,
+  "en": "egg",
+  "ko": "계란"
+ },
+ {
+  "id": 14,
+  "en": "tofu",
+  "ko": "두부"
+ },
+ {
+  "id": 15,
+  "en": "milk",
+  "ko": "우유"
+ },
+ {
+  "id": 16,
+  "en": "apple",
+  "ko": "사과"
+ },
+ {
+  "id": 17,
+  "en": "banana",
+  "ko": "바나나"
+ },
+ {
+  "id": 18,
+  "en": "lemon",
+  "ko": "레몬"
+ },
+ {
+  "id": 19,
+  "en": "bell_pepper",
+  "ko": "파프리카"
+ },
+ {
+  "id": 20,
+  "en": "eggplant",
+  "ko": "가지"
+ },
+ {
+  "id": 21,
+  "en": "broccoli",
+  "ko": "브로콜리"
+ },
+ {
+  "id": 22,
+  "en": "corn",
+  "ko": "옥수수"
+ },
+ {
+  "id": 23,
+  "en": "cheese",
+  "ko": "치즈"
+ },
+ {
+  "id": 24,
+  "en": "sweet_potato",
+  "ko": "고구마"
+ },
+ {
+  "id": 25,
+  "en": "napa_cabbage",
+  "ko": "배추"
+ },
+ {
+  "id": 26,
+  "en": "pear",
+  "ko": "배"
+ },
+ {
+  "id": 27,
+  "en": "mandarin",
+  "ko": "귤"
+ },
+ {
+  "id": 28,
+  "en": "orange",
+  "ko": "오렌지"
+ },
+ {
+  "id": 29,
+  "en": "lime",
+  "ko": "라임"
+ },
+ {
+  "id": 30,
+  "en": "strawberry",
+  "ko": "딸기"
+ },
+ {
+  "id": 31,
+  "en": "grape",
+  "ko": "포도"
+ },
+ {
+  "id": 32,
+  "en": "kiwi",
+  "ko": "키위"
+ }
+]

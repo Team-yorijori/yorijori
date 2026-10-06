@@ -1,0 +1,16 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 소비기한·수량 수정 창 (v6) — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* 재료 칩 → 수정 */
+.chip-edit{background:none;border:0;padding:0;display:inline-flex;align-items:center;gap:6px;color:inherit;font:inherit;cursor:pointer}
+.chip-edit:hover{text-decoration:underline;text-underline-offset:3px}
+.urgent-list .chip-edit{gap:4px}
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.quick button{border:1px solid var(--card-line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px}
+.quick button:hover{background:var(--field)}
+.ed-grid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:center;margin-top:14px}
+.ed-grid .field{border-radius:12px}
+.ed-qty{display:flex;align-items:center;gap:8px}
+.ed-qty .field{width:120px}
+.item-search{max-width:220px}
+td .name-edit{background:none;border:0;padding:0;color:inherit;font:inherit;text-decoration:underline;text-decoration-color:var(--card-line);text-underline-offset:4px}

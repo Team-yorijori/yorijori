@@ -1,0 +1,22 @@
+<!-- AI 매칭 레시피 화면 [프론트] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+  <section data-page="recipes" th:fragment="page" hidden>
+    <div class="rec-head">
+      <div>
+        <h1>AI 매칭 레시피</h1>
+        <div class="note" id="recNote"></div>
+      </div>
+      <button class="btn ghost avoid-btn" id="avoidBtn" type="button">못 먹는 재료</button>
+      <input class="field rec-search" id="recSearch" type="search" placeholder="요리·재료 검색 (초성 가능: ㄱㅊㅉㄱ)" aria-label="레시피 검색">
+      <div class="seg" role="group" aria-label="정렬">
+        <button data-sort="urgent" aria-pressed="true">임박 재료 우선</button>
+        <button data-sort="ready" aria-pressed="false">바로 만들 수 있는 순</button>
+      </div>
+    </div>
+    <div class="grid" id="recGrid"></div>
+    <div class="more-row"><button class="btn ghost" id="recMore" hidden>더 보기</button></div>
+  </section>
+</body>
+</html>

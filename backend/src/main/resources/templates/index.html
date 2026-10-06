@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- 요리조리 — 한 페이지 안에서 화면을 바꾼다 (데모 v9 와 같은 구조). 화면별 HTML 은 pages/*.html 조각 -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>요리조리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css">
+<link rel="stylesheet" th:href="@{/css/preview.css}" href="/css/preview.css">
+<link rel="stylesheet" th:href="@{/css/tabbar.css}" href="/css/tabbar.css">
+<link rel="stylesheet" th:href="@{/css/recipe.css}" href="/css/recipe.css">
+<link rel="stylesheet" th:href="@{/css/scan.css}" href="/css/scan.css">
+<link rel="stylesheet" th:href="@{/css/autocomplete.css}" href="/css/autocomplete.css">
+<link rel="stylesheet" th:href="@{/css/fridge-edit.css}" href="/css/fridge-edit.css">
+<link rel="stylesheet" th:href="@{/css/receipt.css}" href="/css/receipt.css">
+<link rel="stylesheet" th:href="@{/css/video.css}" href="/css/video.css">
+<link rel="stylesheet" th:href="@{/css/cart.css}" href="/css/cart.css">
+<link rel="stylesheet" th:href="@{/css/anim.css}" href="/css/anim.css">
+<link rel="stylesheet" th:href="@{/css/dish.css}" href="/css/dish.css">
+<link rel="stylesheet" th:href="@{/css/scan-avoid.css}" href="/css/scan-avoid.css">
+</head>
+<body>
+
+<div class="frame" id="frame">
+<th:block th:replace="~{fragments/preview :: grips}"></th:block>
+<div class="app" id="app">
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main>
+  <section th:replace="~{pages/home :: page}"></section>
+  <section th:replace="~{pages/fridge :: page}"></section>
+  <section th:replace="~{pages/recipes :: page}"></section>
+  <section th:replace="~{pages/detail :: page}"></section>
+  <section th:replace="~{pages/dishes :: page}"></section>
+  <section th:replace="~{pages/cart :: page}"></section>
+  <section th:replace="~{pages/items :: page}"></section>
+</main>
+<nav th:replace="~{fragments/tabbar :: tabbar}"></nav>
+</div>
+</div>
+
+<th:block th:replace="~{fragments/preview :: panel}"></th:block>
+
+<datalist id="masterList"></datalist>
+<div id="modalRoot"></div>
+<div class="toast" id="toast" hidden></div>
+
+<!-- 서버 설정: 처음 열 화면, 모델 파일 위치 -->
+<script th:inline="javascript">
+  window.YORIJORI = {
+    page: /*[[${page}]]*/ "home",
+    recipeCode: /*[[${recipeCode}]]*/ null,
+    modelUrl: /*[[@{${modelUrl}}]]*/ "/models/fridge.onnx",
+    classesUrl: /*[[@{${classesUrl}}]]*/ "/models/classes.json"
+  };
+</script>
+<!-- 레시피 데이터: DB(recipe·recipe_ingredient·recipe_step)를 데모 recipeData 형식 JSON 으로 (RecipeService.recipeDataJson) -->
+<script id="recipeData" type="application/json" th:utext="${recipeJson}">[]</script>
+
+<script th:src="@{/js/ai/fridge-scan.js}" src="/js/ai/fridge-scan.js"></script>
+<script th:src="@{/js/api.js}" src="/js/api.js"></script>
+<script th:src="@{/js/data.js}" src="/js/data.js"></script>
+<script th:src="@{/js/util.js}" src="/js/util.js"></script>
+<script th:src="@{/js/store.js}" src="/js/store.js"></script>
+<script th:src="@{/js/fridge.js}" src="/js/fridge.js"></script>
+<script th:src="@{/js/recommend.js}" src="/js/recommend.js"></script>
+<script th:src="@{/js/plate.js}" src="/js/plate.js"></script>
+<script th:src="@{/js/render.js}" src="/js/render.js"></script>
+<script th:src="@{/js/ui.js}" src="/js/ui.js"></script>
+<script th:src="@{/js/cook.js}" src="/js/cook.js"></script>
+<script th:src="@{/js/scan-demo.js}" src="/js/scan-demo.js"></script>
+<script th:src="@{/js/scan.js}" src="/js/scan.js"></script>
+<script th:src="@{/js/choseong.js}" src="/js/choseong.js"></script>
+<script th:src="@{/js/edit.js}" src="/js/edit.js"></script>
+<script th:src="@{/js/ai/receipt.js}" src="/js/ai/receipt.js"></script>
+<script th:src="@{/js/receipt-ui.js}" src="/js/receipt-ui.js"></script>
+<script th:src="@{/js/video.js}" src="/js/video.js"></script>
+<script th:src="@{/js/cart.js}" src="/js/cart.js"></script>
+<script th:src="@{/js/anim.js}" src="/js/anim.js"></script>
+<script th:src="@{/js/dish.js}" src="/js/dish.js"></script>
+<script th:src="@{/js/scan-rules.js}" src="/js/scan-rules.js"></script>
+<script th:src="@{/js/scan-multi.js}" src="/js/scan-multi.js"></script>
+<script th:src="@{/js/avoid.js}" src="/js/avoid.js"></script>
+<script th:src="@{/js/auth.js}" src="/js/auth.js"></script>
+<script th:src="@{/js/app.js}" src="/js/app.js"></script>
+<script th:src="@{/js/preview.js}" src="/js/preview.js"></script>
+<script th:src="@{/js/init.js}" src="/js/init.js"></script>
+</body>
+</html>

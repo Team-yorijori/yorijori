@@ -1,0 +1,81 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* PC/모바일 미리보기 프레임 + 컨테이너 기준 반응형 — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* ---------- PC / 모바일 미리보기 전환 ---------- */
+:root{--stage:#E4D8CE}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stage:#120D0B}}
+:root[data-theme="dark"]{--stage:#120D0B}
+html.view-mobile,html.view-mobile body{background:var(--stage)}
+/* 바깥 프레임(크기 조절 대상)과 안쪽 앱(컨테이너 쿼리 기준)을 분리 */
+:root{--frame-w:390px;--frame-h:844px}
+.frame{position:relative;z-index:1;width:100%;max-width:100vw;margin:0 auto;border-radius:0;box-shadow:0 0 0 0 rgba(0,0,0,0);
+  transition:max-width .6s cubic-bezier(.22,.8,.2,1),height .45s cubic-bezier(.22,.8,.2,1),margin .6s cubic-bezier(.22,.8,.2,1),border-radius .6s ease,box-shadow .6s ease}
+/* 모바일 보기: 페이지 자체는 고정, 기기 화면 안에서만 스크롤 */
+html.view-mobile,html.view-mobile body{overflow:hidden;height:100%}
+html.view-mobile .frame{max-width:var(--frame-w);height:var(--frame-h);
+  margin-block:max(28px,calc((100vh - var(--frame-h)) / 2));border-radius:34px;
+  box-shadow:0 0 0 10px #2A1E19,0 0 0 11px rgba(255,255,255,.08),0 30px 80px rgba(30,18,12,.35)}
+.frame.resizing{transition:none}
+.app{container:app / inline-size;position:relative;background:transparent;width:100%;min-height:100vh;border-radius:inherit;overflow:clip}
+html.view-mobile .app{background:var(--bg);min-height:0;height:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
+  scrollbar-color:var(--block) transparent}
+html.view-mobile .app::-webkit-scrollbar{width:6px}
+html.view-mobile .app::-webkit-scrollbar-thumb{background:var(--block);border-radius:999px}
+html.view-mobile .bar{border-radius:0}
+
+/* 크기 조절 손잡이: 좌우(폭) · 아래(높이) */
+.grip{display:none;position:absolute;top:0;bottom:0;width:26px;z-index:5;cursor:ew-resize;touch-action:none}
+.grip-l{left:-36px}
+.grip-r{right:-36px}
+.grip-b{top:auto;bottom:-36px;left:0;right:0;width:auto;height:26px;cursor:ns-resize}
+html.view-mobile .grip{display:block}
+.grip i{position:absolute;top:50%;left:50%;width:8px;height:68px;transform:translate(-50%,-50%);border-radius:999px;background:var(--bar);opacity:.55;
+  transition:opacity .2s ease,transform .2s ease}
+.grip-b i{width:68px;height:8px}
+.grip:hover i,.frame.resizing .grip i{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
+.grip:focus-visible i{opacity:1;outline:2px solid var(--accent-strong);outline-offset:3px}
+
+/* 폭 표시 · 프리셋 패널 */
+.size-panel{position:fixed;right:20px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:40;display:none;flex-direction:column;gap:8px;
+  padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);width:236px}
+html.view-mobile .size-panel{display:flex}
+.size-read{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px}
+.size-read b{font-weight:400;font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.size-read span{font-size:12px;color:var(--muted)}
+.size-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.size-presets button{border:0;border-radius:8px;padding:6px 0;background:var(--field);font-size:12px;font-variant-numeric:tabular-nums;line-height:1.3}
+.size-presets button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.size-presets small{display:block;font-size:10px;opacity:.75}
+.size-panel input[type=range]{width:100%;accent-color:var(--accent-strong)}
+@media (max-width:640px){.size-panel{display:none!important}}
+.app.morphing main,.app.morphing .bar-in,.app.morphing .tabbar{animation:viewfade .6s ease}
+@keyframes viewfade{0%{opacity:1}35%{opacity:.35}100%{opacity:1}}
+.view-toggle{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:40;display:inline-flex;align-items:center;gap:8px;
+  border:0;border-radius:999px;padding:10px 16px 10px 12px;background:var(--bar);color:var(--bar-ink);font-size:14px;box-shadow:0 8px 24px rgba(30,18,12,.28)}
+.view-toggle:hover{filter:brightness(1.12)}
+.view-toggle .ico{position:relative;width:22px;height:22px}
+.view-toggle .ico svg{position:absolute;inset:0;width:22px;height:22px;transition:opacity .3s ease,transform .4s cubic-bezier(.22,.8,.2,1)}
+.view-toggle .i-phone{opacity:1;transform:none}
+.view-toggle .i-pc{opacity:0;transform:rotate(-90deg) scale(.6)}
+html.view-mobile .view-toggle .i-phone{opacity:0;transform:rotate(90deg) scale(.6)}
+html.view-mobile .view-toggle .i-pc{opacity:1;transform:none}
+@media (max-width:640px){.view-toggle{display:none}}
+
+/* 컨테이너 기준 반응형: 미리보기 전환 시에도 모바일 레이아웃이 적용되도록 */
+@container app (max-width:900px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two{grid-template-columns:minmax(0,1fr)}
+  .detail-left .plate{aspect-ratio:16/10}
+}
+@container app (max-width:640px){
+  .bar-in{height:auto;flex-wrap:wrap;padding-block:10px;gap:8px 12px}
+  .nav{order:3;width:100%;margin:0}
+  .bar-actions{margin-left:auto}
+  .steps3{grid-template-columns:minmax(0,1fr)}
+  .add-row{grid-template-columns:minmax(0,1fr) auto}
+  .add-row .date{grid-column:1 / -1;width:100%;order:3}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .stats b{font-size:22px}
+  .hero{padding-block:8px 20px}
+}

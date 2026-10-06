@@ -1,0 +1,8 @@
+/* 요리조리 — 데모 v9 에서 나눈 파일. 원본: demo/요리조리_데모_v9.html */
+/* 레시피 검색 · 더 보기 (v4) — 순서대로 불러온다 (뒤 파일이 앞 파일을 덮어쓴다) */
+
+/* ---------- v4: 레시피 검색 · 더 보기 ---------- */
+.rec-search{max-width:260px;border-radius:999px}
+.more-row{display:flex;justify-content:center;margin-top:18px}
+.ing .amt{text-align:right;max-width:46%;line-height:1.35}
+@container app (max-width:640px){ .rec-search{max-width:none;width:100%} }

@@ -1,0 +1,25 @@
+<!-- v8: 만든 요리 화면 [프론트] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+  <section data-page="dishes" th:fragment="page" hidden>
+    <div class="two dishes-two">
+      <div class="card">
+        <div class="rec-head" style="margin-bottom:6px">
+          <div>
+            <h1 class="big">만든 요리</h1>
+            <div class="note" id="dishNote"></div>
+          </div>
+        </div>
+        <div class="dish-grid" id="dishGrid"></div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:20px">이번 달 요리 기록</h2>
+        <div class="stats stats4" id="cookStats"></div>
+        <div class="label" style="margin-top:16px">최근 기록</div>
+        <ul class="log-list" id="cookLog"></ul>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

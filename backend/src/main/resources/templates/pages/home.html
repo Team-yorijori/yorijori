@@ -1,0 +1,33 @@
+<!-- 홈 화면 [프론트] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+  <section data-page="home" th:fragment="page">
+    <div class="hero">
+      <h1>냉장고 재료, <em>AI가 완벽한 요리</em>로<br>만들어 드립니다</h1>
+      <p>가지고 있는 재료를 입력하거나 사진으로 찍어보세요. 소비기한이 가까운 재료부터 쓰는 레시피를 먼저 제안합니다.</p>
+    </div>
+    <div class="card home-card">
+      <div class="home-head">
+        <div>
+          <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14M9 6v2M9 13v3"/></svg>My 냉장고</h2>
+          <div class="note">냉장고 속 재료를 입력하면 소비기한을 자동으로 계산합니다.</div>
+        </div>
+        <form class="row home-input" id="homeForm">
+          <input class="field" id="homeInput" data-ac autocomplete="off" placeholder="예: 양배추" aria-label="재료 이름">
+          <button class="btn" type="submit">추가</button>
+        </form>
+      </div>
+      <div class="hint" id="homeHint"></div>
+      <div class="label">현재 입력된 재료</div>
+      <div class="basket"><div class="chips" id="homeChips"></div></div>
+      <div class="home-cta"><button class="btn strong" data-go="recipes">이 재료로 레시피 추천받기</button></div>
+    </div>
+    <div class="steps3">
+      <div class="card"><b>소비기한 자동 안내</b><span class="sub">표시가 없는 신선 재료도 품목별 보관 기간으로 날짜를 잡아줍니다.</span></div>
+      <div class="card"><b>임박 재료 우선 추천</b><span class="sub">곧 버리게 될 재료를 쓰는 요리가 맨 앞에 옵니다.</span></div>
+      <div class="card"><b>요리 후 자동 차감</b><span class="sub">요리 완료를 누르면 쓴 만큼 냉장고에서 빠집니다.</span></div>
+    </div>
+  </section>
+</body>
+</html>

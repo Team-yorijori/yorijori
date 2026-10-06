@@ -1,0 +1,9 @@
+# MySQL 8 — 로컬 Docker 또는 AWS RDS
+#   docker run -d --name yorijori-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=yorijori mysql:8.4
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/yorijori?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  thymeleaf:
+    cache: true

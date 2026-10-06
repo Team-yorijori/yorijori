@@ -1,0 +1,32 @@
+<!-- v6: 장보기 화면 [프론트] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+  <section data-page="cart" th:fragment="page" hidden>
+    <div class="two">
+      <div class="card">
+        <h1 class="big">장보기</h1>
+        <form class="add-row cart-add" id="cartForm">
+          <input class="field" id="cartInput" data-ac autocomplete="off" placeholder="살 재료 (초성 가능)" aria-label="살 재료">
+          <input class="field date" id="cartTarget" type="number" min="0" step="100" inputmode="numeric" placeholder="목표가(원, 선택)" aria-label="목표가">
+          <button class="btn" type="submit">담기</button>
+        </form>
+        <div class="hint" id="cartHint"></div>
+        <div class="label">살 재료 · 레시피 화면에서 부족한 재료를 한 번에 담을 수 있습니다</div>
+        <ul class="cart-list" id="cartList"></ul>
+      </div>
+      <div class="card">
+        <h2 style="font-size:20px">최저가 안내</h2>
+        <p class="sub" style="margin:6px 0 0">담아 둔 재료의 가격을 매일 쇼핑몰과 비교해서, 목표가 아래로 내려가거나 최근 30일 중 가장 쌀 때 알려 줍니다.</p>
+        <ol class="how cart-how">
+          <li>필요한 재료를 담는다 (레시피의 부족한 재료도 한 번에)</li>
+          <li>사고 싶은 가격(목표가)을 적는다</li>
+          <li>서버가 하루 몇 번 가격을 확인하고, 조건이 맞으면 알림을 보낸다</li>
+          <li>샀으면 '샀어요'를 눌러 바로 냉장고로 옮긴다</li>
+        </ol>
+        <div class="callout">데모에서는 실제 가격을 불러오지 않고, 쇼핑몰별 '낮은 가격순' 검색 결과로 바로 연결합니다. 가격 확인과 알림은 서버 연동 단계에서 붙입니다.</div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

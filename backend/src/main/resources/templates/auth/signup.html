@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- 회원가입 화면 (주소로 바로 들어올 때). 앱 안에서는 상단 '로그인' 버튼의 창을 쓴다 [프론트] -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>회원가입 · 요리조리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css">
+<style>
+  .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+  .auth-card{width:min(420px,100%)}
+  .auth-card h1{font-size:26px;margin:4px 0 6px}
+  .auth-card .form{display:grid;gap:10px;margin-top:18px}
+  .auth-logo{display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <a class="auth-logo" th:href="@{/}" href="/"><b>요리조리</b><span class="note">냉장고를 부탁해</span></a>
+    <h1>회원가입</h1>
+    <div class="sub">이메일로 가입하면 냉장고가 하나 만들어집니다. 가족 공유는 준비 중입니다.</div>
+    <form class="form" id="authForm" novalidate>
+      <input class="field" type="email" id="email" placeholder="이메일" autocomplete="email" required>
+      <input class="field" type="password" id="password" placeholder="비밀번호 (8자 이상)" autocomplete="new-password" required>
+      <input class="field" type="password" id="password2" placeholder="비밀번호 확인" autocomplete="new-password" required>
+      <input class="field" type="text" id="nickname" placeholder="닉네임 (선택)" maxlength="30" autocomplete="nickname">
+      <div class="note" id="err" style="color:var(--danger);min-height:18px"></div>
+      <div class="actions" style="margin-top:0"><a class="btn ghost" th:href="@{/login}" href="/login">로그인</a><button class="btn strong" type="submit">회원가입</button></div>
+    </form>
+  </div>
+</div>
+<script th:src="@{/js/api.js}" src="/js/api.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  $("authForm").onsubmit = async e => {
+    e.preventDefault();
+    const err = $("err"); err.textContent = "";
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($("email").value.trim())) { err.textContent = "이메일 형식을 확인하세요."; return; }
+    if ($("password").value.length < 8) { err.textContent = "비밀번호는 8자 이상입니다."; return; }
+    if ($("password2") && $("password2").value !== $("password").value) { err.textContent = "비밀번호가 서로 다릅니다."; return; }
+    try {
+      await Api.post("/api/auth/signup", { email: $("email").value.trim(), password: $("password").value, nickname: $("nickname").value.trim() });
+      location.href = "/fridge";
+    } catch (ex) { err.textContent = ex.message; }
+  };
+</script>
+</body>
+</html>
