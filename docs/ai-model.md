@@ -8,10 +8,10 @@
 | 모델 | YOLO26n (Ultralytics 8.4) → `export(format="onnx", imgsz=640, nms=False)` |
 | 입력 | `images` `[1, 3, 640, 640]` RGB 0~1 (긴 변 640, 회색 114 패딩) |
 | 출력 | `output0` `[1, 300, 6]` = x1, y1, x2, y2, score, classId (640×640 기준) |
-| classes.json | `[{ "id": 0, "en": "cabbage", "ko": "양배추" }, …]` — `ko` 는 `ingredient.name` 과 같아야 한다 |
+| classes.json | `[{ "id": 0, "en": "cabbage", "ko": "양배추" }, …]` — `ko` 는 `ingredient.name` 과 같아야 함 |
 | 실행 | 브라우저 onnxruntime-web 1.30 (WebGPU 우선, 안 되면 WASM) — `static/js/ai/fridge-scan.js` |
 
-이 규칙만 지키면 **모델 파일 두 개만 바꿔 끼우면 된다.** 클래스가 바뀌면 `scan_class` 에 새 버전 행을 넣는 V 파일을 추가하고 `application.yml` 의 `yorijori.scan.model-version` 을 바꾼다.
+이 규칙만 지키면 **모델 파일 두 개만 바꿔 끼우면 끝.** 클래스가 바뀌면 `scan_class` 에 새 버전 행을 넣는 V 파일 추가, `application.yml` 의 `yorijori.scan.model-version` 변경
 
 ## v4 성능 (검증 mAP50 0.905)
 
@@ -25,7 +25,7 @@
 
 헷갈리는 재료 (결과 줄에 "혹시 ○○?" 버튼): 오렌지↔귤↔레몬↔라임, 귤·오렌지→감(미학습), 양배추↔배추, 애호박↔오이, 감자↔고구마, 토마토↔파프리카, 치즈↔두부
 
-값은 `scan_class` 테이블(V2) 과 `static/js/scan-rules.js` 에 같이 있다. 바꿀 때 둘 다 고친다. (TODO(프론트) `scan-rules.js` 가 `/api/scan/classes` 를 읽게 바꾸면 한 곳만 고치면 된다)
+값은 `scan_class` 테이블(V2) 과 `static/js/scan-rules.js` 두 곳에 있음. 바꿀 때 둘 다 수정 (TODO(프론트) `scan-rules.js` 가 `/api/scan/classes` 를 읽게 바꾸면 한 곳만 수정)
 
 ## 다음 학습 (v5) 계획
 
@@ -33,4 +33,4 @@
 2. `scan_feedback` 에 쌓인 "자주 헷갈리는 쌍" 을 보고 우선순위 조정 (`ScanFeedbackRepository.confusionCounts`)
 3. v4 best.pt 에서 이어 학습 → 같은 규칙으로 ONNX 변환 → `static/models/` 교체
 
-학습 방법: `ai/README.md`
+학습 방법 : [ai/README.md](../ai/README.md)
