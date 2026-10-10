@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,7 +33,7 @@ class ApiFlowTest {
         MockHttpSession s = new MockHttpSession();
 
         // 로그인 전에는 401
-        mvc.perform(get("/api/fridge/items")).andExpect(status().isUnauthorized());
+        mvc.perform(MockMvcRequestBuilders.get("/api/fridge/items")).andExpect(status().isUnauthorized());
 
         // 가입 (가입하면 바로 로그인)
         post(s, "/api/auth/signup", "{\"email\":\"test@yorijori.kr\",\"password\":\"password1\",\"nickname\":\"테스트\"}");
@@ -90,8 +91,8 @@ class ApiFlowTest {
         assertThat(get(s, "/api/cart").at("/data").size()).isZero();
 
         // 화면
-        mvc.perform(get("/")).andExpect(status().isOk());
-        mvc.perform(get("/api/scan/classes")).andExpect(jsonPath("$.data.length()").value(33));
+        mvc.perform(MockMvcRequestBuilders.get("/")).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders.get("/api/scan/classes")).andExpect(jsonPath("$.data.length()").value(33));
     }
 
     private JsonNode post(MockHttpSession s, String url, String body) throws Exception {
@@ -101,6 +102,7 @@ class ApiFlowTest {
         return om.readTree(r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
+    // 이름이 MockMvcRequestBuilders.get(url) 을 가리므로, 세션 없는 요청은 MockMvcRequestBuilders.get(...) 으로 쓴다
     private JsonNode get(MockHttpSession s, String url) throws Exception {
         MvcResult r = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(url).session(s))
                 .andExpect(status().isOk()).andReturn();
