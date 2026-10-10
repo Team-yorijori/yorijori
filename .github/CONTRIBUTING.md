@@ -198,4 +198,5 @@ git switch develop
 - IntelliJ에서 `backend/` 폴더를 열고 Gradle 프로젝트로 불러오기
 - `application-secret.example.yml`을 같은 폴더에 `application-secret.yml`로 복사하고 필요한 키만 입력 (없어도 local 프로필로 실행 가능)
 - 실행 : `cd backend` → `./gradlew bootRun` (윈도우는 `gradlew.bat bootRun`) → http://localhost:8080
+- 준비물·동작 확인·자주 나는 에러는 [README 12절 실행 방법](../README.md#12-실행-방법) 참고
 - 줄바꿈은 `.gitattributes`가 자동으로 맞춰 줌. 윈도우에서 따로 설정할 것 없음
