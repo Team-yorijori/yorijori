@@ -1,6 +1,6 @@
 """
 데모 단일 HTML(v9) → Spring 프로젝트의 templates / static/css / static/js 로 나눈다.
-  python tools/split_demo.py demo/요리조리_데모_v9.html backend/src/main/resources
+  python demo/build/split_demo.py demo/요리조리_데모_v9.html backend/src/main/resources
 
 원칙
 - 데모 코드를 지우지 않고 원래 순서대로 잘라 파일만 나눈다 (전역 변수·함수 그대로, 일반 <script> 로 순서대로 불러온다)

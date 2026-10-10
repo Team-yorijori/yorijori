@@ -2,8 +2,8 @@
 
 - 주소 앞부분: `http://localhost:8080` (로컬) · 배포 후 AWS 주소
 - 형식: JSON, UTF-8. 날짜는 `2026-10-06`, 시각은 `2026-10-06T20:30:00`
-- 로그인: 세션 쿠키 (`/api/auth/login` 성공하면 `JSESSIONID`). 화면에서는 `fetch(url, { credentials: "same-origin" })` → `static/js/api.js` 의 `Api.get/post/...` 를 쓴다
-- 바뀌면 이 파일을 **먼저** 고치고 PR 설명에 적는다
+- 로그인: 세션 쿠키 (`/api/auth/login` 성공하면 `JSESSIONID`). 화면에서는 `fetch(url, { credentials: "same-origin" })` → `static/js/api.js` 의 `Api.get/post/...` 사용
+- 바뀌면 이 파일을 **먼저** 고치고 PR 설명에 기록
 
 ## 공통 응답
 
@@ -20,7 +20,7 @@
 | *_NOT_FOUND | 404 | 냉장고 재료·레시피·만든 요리·장보기 항목 없음 |
 | EXTERNAL_API_ERROR | 502 | 네이버·YouTube 응답 없음 |
 
-로그인 없이 쓸 수 있는 것: 화면(`/`, `/fridge` …), `GET /api/ingredients/**`, `GET /api/recipes/{code}`, `GET /api/recipes/data`, `GET /api/scan/classes`, `/api/auth/**`
+로그인 없이 쓸 수 있는 것 : 화면(`/`, `/fridge` …), `GET /api/ingredients/**`, `GET /api/recipes/{code}`, `GET /api/recipes/data`, `GET /api/scan/classes`, `/api/auth/**`
 
 ---
 
@@ -38,8 +38,8 @@
 
 ```http
 POST /api/auth/signup
-{ "email": "minseo@ks.ac.kr", "password": "password1", "nickname": "민서" }
-→ { "ok": true, "data": { "id": 1, "email": "minseo@ks.ac.kr", "nickname": "민서", "animOn": true }, "message": "민서 님, 가입을 환영합니다." }
+{ "email": "cook@yorijori.kr", "password": "password1", "nickname": "요리왕" }
+→ { "ok": true, "data": { "id": 1, "email": "cook@yorijori.kr", "nickname": "요리왕", "animOn": true }, "message": "요리왕 님, 가입을 환영합니다." }
 ```
 
 ```http
@@ -48,7 +48,7 @@ PUT /api/me/avoid
 ```
 - `groups`: 알레르기 묶음 이름 (`GET /api/ingredients/avoid-groups` 목록 중)
 - `items`: 직접 넣은 재료
-- `show`: `false` 면 추천에서 뺀다, `true` 면 빼지 않고 표시만 (목록 맨 뒤)
+- `show`: `false` 면 추천에서 제외, `true` 면 제외하지 않고 표시만 (목록 맨 뒤)
 
 ## 2. 재료 기준표 `ingredient`
 
@@ -62,7 +62,7 @@ PUT /api/me/avoid
 ```http
 POST /api/scan/feedback
 { "modelVersion": "v4", "consent": true, "rows": [ { "predicted": "귤", "corrected": "감", "score": 0.98 } ] }
-→ { "data": 1 }   // 저장한 줄 수 (predicted == corrected 인 줄은 건너뛴다)
+→ { "data": 1 }   // 저장한 줄 수 (predicted == corrected 인 줄은 건너뜀)
 ```
 
 ## 3. 냉장고 `fridge`
@@ -87,10 +87,10 @@ POST /api/fridge/items
                   "expDate": "2026-10-27", "expAuto": true, "dday": 21, "source": "RECEIPT" },
         "message": "계란 추가 · 소비기한 10/27 자동 안내 (냉장 21일 기준)" }, …
     ],
-    "removedFromCart": ["두부"]          // 장보기 목록에 있던 재료는 자동으로 뺀다
+    "removedFromCart": ["두부"]          // 장보기 목록에 있던 재료는 자동 삭제
 } }
 ```
-- 이름은 표준 이름으로 바뀐다 (`ingredient_alias`: 달걀 → 계란)
+- 이름은 표준 이름으로 변환 (`ingredient_alias`: 달걀 → 계란)
 - 소비기한: `expDate` 직접 입력 > 기준표 보관 일수 > 7일
 - `qty` 가 없으면 기준표 기본 수량
 - 못 먹는 재료면 `message` 끝에 ` · 못 먹는 재료로 설정된 재료입니다`
@@ -126,7 +126,7 @@ PATCH /api/fridge/items/7
 } }
 ```
 
-값은 예시다. 상세의 재료 `status`: `HAVE` 보유 · `LOW` 조금 부족 · `MISSING` 부족 · `OPTIONAL` 선택 재료
+값은 예시. 상세의 재료 `status`: `HAVE` 보유 · `LOW` 조금 부족 · `MISSING` 부족 · `OPTIONAL` 선택 재료
 
 ## 5. 만든 요리 `dish`
 
@@ -145,7 +145,7 @@ POST /api/recipes/r212/cook
               "deducted": 2, "saved": ["두부"] },
     "message": "두부조림 2인분을 만든 요리에 보관했습니다 · 재료 2종 차감 · 임박 재료 1개 살림" }
 ```
-- `qty: 0` 인 재료는 차감하지 않는다. `uses` 가 비어 있으면 보관만 한다
+- `qty: 0` 인 재료는 차감 안 함. `uses` 가 비어 있으면 보관만
 - 보관 기한: 레시피 분류별 (밥 1일, 볶음 2일, 국·찌개 3일, 조림 4일 …, `recipe.storage_days`)
 - 살린 임박 재료: 쓴 재료 중 소비기한 D-3 이내
 
@@ -159,7 +159,7 @@ POST /api/recipes/r212/cook
 | DELETE | `/api/cart/{id}` | 빼기 |
 | POST | `/api/cart/{id}/bought` | 샀어요 → 냉장고로 |
 
-최저가: 서버 스케줄러(`PriceCheckScheduler`)가 하루 3번 네이버 쇼핑 검색 API로 확인해 `lowestPrice` 를 채운다 (`yorijori.naver.enabled=true` + 키 필요). 목표가 이하로 내려가면 알림 — 알림 방식은 미정(TODO).
+최저가: 서버 스케줄러(`PriceCheckScheduler`)가 하루 3번 네이버 쇼핑 검색 API로 확인해 `lowestPrice` 입력 (`yorijori.naver.enabled=true` + 키 필요). 목표가 이하로 내려가면 알림 — 알림 방식은 미정(TODO).
 
 ## 7. 화면 주소
 

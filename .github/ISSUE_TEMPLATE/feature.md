@@ -21,7 +21,7 @@ assignees: ''
 
 ## 파트
 
-<!-- 해당하는 것만 남긴다: back / front / ai / docs -->
+<!-- 해당하는 것만 남기기: back / front / ai / docs -->
 
 ## 참고
 
