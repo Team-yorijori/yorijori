@@ -467,18 +467,28 @@ cp src/main/resources/application-secret.example.yml src/main/resources/applicat
 
 ## 14. 협업 규칙
 
+> 전체 규칙(리뷰·머지 방식·릴리스·DB 마이그레이션 약속·이슈)은 **[CONTRIBUTING.md](CONTRIBUTING.md)** 에 있다. 아래는 요약이다.
+
 **브랜치**
 
 - `main`: 배포용. 직접 푸시하지 않는다.
 - `develop`: 통합용.
 - `feature/{파트}-{기능}`: 예) `feature/back-fridge-api`, `feature/front-dish-anim`, `feature/ai-model-v4`
+- `fix/{파트}-{내용}`: 버그 수정. 예) `fix/front-tabbar-overlap`
+- 파트: `back` · `front` · `ai` · `docs` · `demo`
 
 **커밋 메시지**: `feat:` 기능 · `fix:` 버그 · `refactor:` 구조 개선 · `docs:` 문서 · `chore:` 설정·빌드
+
+- 파트를 붙여도 된다: `feat(back): 냉장고 재료 수정 API 추가`
 
 **PR**
 
 - `develop`으로 보내고, 팀원 1명 이상이 확인한 뒤 머지한다.
 - API 명세나 모델 파일 규칙이 바뀌면 PR 설명에 적는다.
+- PR 템플릿의 체크리스트를 채우고, CI(빌드·테스트)가 통과해야 머지한다.
+- `develop`으로는 Squash and merge, 발표 전 `main`으로는 merge commit을 쓴다.
+
+**DB**: 머지된 `V*.sql`은 고치지 않고 새 번호 파일을 추가한다.
 
 **올리지 않는 것**: API 키·비밀번호, 학습 데이터셋 원본, 대용량 학습 결과 (`runs/`)
 

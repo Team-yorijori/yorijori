@@ -1,0 +1,27 @@
+# 줄바꿈을 저장소 안에서는 LF로 맞춘다 (윈도우·맥 팀원이 섞여도 diff가 안 깨진다)
+* text=auto eol=lf
+
+# 윈도우 전용 스크립트는 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 맥·리눅스·CI에서 실행되는 스크립트
+gradlew text eol=lf
+
+# 바이너리 (줄바꿈 변환·diff 하지 않는다)
+*.onnx binary
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+
+# GitHub 언어 통계에서 자동 생성·데이터 파일 제외
+demo/*.html linguist-generated
+backend/src/main/resources/db/migration/V3__seed_recipe.sql linguist-generated
+ai/data/legacy/*.sql linguist-generated
+ai/data/recipes.json linguist-generated
