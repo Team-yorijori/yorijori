@@ -419,15 +419,82 @@ erDiagram
 
 ## 12. 실행 방법
 
-### 서버 (Spring Boot)
+### 처음 실행하기 (서버 + 화면)
+
+**준비물**
+
+| 필요한 것 | 확인 방법 | 없으면 |
+|---|---|---|
+| JDK 17 이상 | 터미널에서 `java -version` | [Temurin JDK 21](https://adoptium.net) 설치 |
+| Git | `git --version` | [git-scm.com](https://git-scm.com) 설치 |
+| 인터넷 | — | 처음 실행 때 Gradle·라이브러리 다운로드 |
+
+MySQL은 없어도 됨. 기본 실행은 H2 메모리 DB를 자동으로 만들어서 사용
+
+**1. 코드 받기** (처음 한 번)
+
+```bash
+cd C:\Users\본인계정\IdeaProjects        # 원하는 폴더
+git clone https://github.com/Team-yorijori/yorijori.git
+cd yorijori
+```
+
+**2. 서버 실행**
 
 ```bash
 cd backend
-./gradlew bootRun                 # local 프로필: H2 메모리 DB, 설치 필요 없음
-# → http://localhost:8080   (H2 콘솔: /h2-console, JDBC URL jdbc:h2:mem:yorijori, 사용자 sa)
+gradlew.bat bootRun        # 윈도우
+./gradlew bootRun          # 맥·리눅스
 ```
 
-MySQL로 실행
+- 처음 실행은 Gradle·라이브러리를 받느라 몇 분 걸림. 두 번째부터는 금방 뜸
+- 로그 마지막에 `Started YorijoriApplication`이 보이면 실행 완료
+- IntelliJ로 실행할 때 : `backend` 폴더 열기 → Gradle 불러오기 끝날 때까지 대기 → `YorijoriApplication` 의 ▶ 버튼
+
+**3. 접속**
+
+| 주소 | 내용 |
+|---|---|
+| http://localhost:8080 | 서비스 화면 |
+| http://localhost:8080/h2-console | DB 확인 (JDBC URL `jdbc:h2:mem:yorijori`, 사용자 `sa`, 비밀번호 없음) |
+
+**4. 동작 확인 (5분)**
+
+1. 회원가입 → 로그인 → 상단에 닉네임 표시
+2. 냉장고에 재료 입력, 초성 검색 `ㅇㅍ` → 양파
+3. 레시피 추천 목록 → 상세 → 요리 완료
+4. 재료 사진 스캔 (localhost는 카메라 허용됨)
+
+**5. 끄기** : 터미널에서 `Ctrl + C`
+
+> **현재 상태 주의**
+> - 회원·로그인은 서버(H2)에 저장되지만, H2는 메모리 DB라 **서버를 끄면 초기화**
+> - 냉장고·만든 요리·장보기는 아직 **브라우저(localStorage)에 저장**. 서버 저장으로 바꾸는 작업이 #7
+> - 서버를 꺼도 데이터를 남기려면 아래 MySQL 실행 사용 (#5)
+
+**자주 나는 문제**
+
+| 증상 | 해결 |
+|---|---|
+| `Port 8080 was already in use` | 다른 프로그램이 8080 사용 중 → `gradlew.bat bootRun --args="--server.port=8081"` 후 http://localhost:8081 |
+| `JAVA_HOME is not set` / `java` 명령 없음 | JDK 설치 후 터미널 다시 열기. 그래도 안 되면 환경 변수 `JAVA_HOME`에 JDK 폴더 지정 |
+| `Unsupported class file major version` | JDK 버전이 17보다 낮음 → JDK 17 이상 설치 |
+| 맥에서 `permission denied: ./gradlew` | `chmod +x gradlew` 한 번 실행 |
+| 화면은 뜨는데 스캔이 안 됨 | 인터넷 연결 확인 (인식 엔진을 처음 한 번 CDN에서 받음) |
+
+그 밖의 에러는 터미널의 빨간 부분을 복사해서 버그 이슈로 등록
+
+### 테스트
+
+```bash
+gradlew.bat test           # 윈도우 (맥·리눅스는 ./gradlew test)
+```
+
+- 시드 데이터 확인 + 가입 → 재료 등록 → 추천 → 못 먹는 재료 → 요리 완료 → 먹기 → 통계 → 장보기 흐름
+- PR마다 GitHub Actions에서 자동 실행
+- 서버 시작 시 Flyway가 스키마와 seed(재료 70종, 레시피 560건, 스캔 클래스)를 자동 반영
+
+### MySQL로 실행 (데이터 유지)
 
 ```bash
 docker run -d --name yorijori-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=yorijori mysql:8.4
@@ -435,8 +502,7 @@ cp src/main/resources/application-secret.example.yml src/main/resources/applicat
 ./gradlew bootRun --args='--spring.profiles.active=mysql'
 ```
 
-- 서버 시작 시 Flyway가 스키마와 seed(재료 70종, 레시피 560건, 스캔 클래스)를 자동 반영
-- 테스트: `./gradlew test` (가입 → 재료 등록 → 추천 → 못 먹는 재료 → 요리 완료 → 먹기 → 통계 → 장보기 흐름). PR마다 GitHub Actions에서 자동 실행
+- `application-secret.yml`은 깃에 올라가지 않음 (각자 생성)
 - 재료 인식 엔진(onnxruntime-web)과 글자 인식(tesseract.js)은 처음 한 번 CDN에서 받음. 스캔은 https 또는 localhost에서만 카메라 사용 가능
 
 ### 데모 (단일 HTML)
