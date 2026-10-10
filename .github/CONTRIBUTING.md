@@ -188,7 +188,7 @@ README 6절 "파트 통일 규칙"에 더해 아래 내용 준수
 ## 10. 처음 시작할 때
 
 ```bash
-git clone https://github.com/yuyoungwoo/yorijori.git
+git clone https://github.com/Team-yorijori/yorijori.git
 cd yorijori
 git config user.name "본인 이름"
 git config user.email "GitHub 가입 이메일"
