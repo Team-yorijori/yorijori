@@ -248,4 +248,3 @@ V1 컬럼 정의 + V4 제약·인덱스 기준, 총 19개 테이블. 기존 타�
 | score | DOUBLE | 예 | — | — | 인식 점수 |
 | consent | BOOLEAN | 아니오 | — | — | 재학습 사용 동의 |
 | created_at | DATETIME | 예 | — | — | 생성 시각(앱 기록) |
-
