@@ -23,6 +23,9 @@ public class CookingLog {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(name="fridge_id")
+    private Long fridgeId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private LogKind kind;
@@ -80,9 +83,12 @@ public class CookingLog {
         return new CookingLog(userId, LogKind.TOSS_ING, null, null, name, qty, null, date);
     }
 
-    public void addIngredient(String name, double qty, Long daysLeft) {
-        ingredients.add(new CookingLogIngredient(this, name, qty, daysLeft));
+    public void addIngredient(String name, double qty, Long daysLeft, Long ingredientId) {
+        ingredients.add(new CookingLogIngredient(this, name, qty, daysLeft, ingredientId));
     }
+
+    public CookingLog inFridge(Long fridgeId) { this.fridgeId = fridgeId; return this; }
+    public void recordSaved(List<String> saved) { this.savedNames = String.join(",", saved); }
 
     public Long getId() { return id; }
     public Long getUserId() { return userId; }

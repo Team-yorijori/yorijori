@@ -77,9 +77,10 @@ public class FridgeItem {
 
     /** need 만큼 빼고, 실제로 뺀 양을 돌려준다 */
     public double take(double need) {
+        double before = qty;
         double t = Math.min(qty, Math.max(0, need));
-        qty = Math.round((qty - t) * 100) / 100.0;
-        return t;
+        qty = Math.max(0, Math.round((qty - t) * 100) / 100.0);
+        return Math.max(0, before - qty);
     }
 
     public void changeQty(double qty) { this.qty = Math.max(0, Math.round(qty * 100) / 100.0); }

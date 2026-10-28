@@ -1,6 +1,7 @@
 package com.yorijori.cart;
 
 import jakarta.persistence.*;
+import com.yorijori.ingredient.Ingredient;
 
 import java.time.LocalDateTime;
 
@@ -34,6 +35,19 @@ public class PriceHistory {
 
     @Column(name = "checked_at", nullable = false)
     private LocalDateTime checkedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredient_id")
+    private Ingredient ingredient;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    public void link(Ingredient ingredient, Product product) {
+        this.ingredient = ingredient;
+        this.product = product;
+    }
 
     protected PriceHistory() {}
 

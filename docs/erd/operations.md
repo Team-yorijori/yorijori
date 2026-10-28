@@ -104,3 +104,50 @@ unset YORIJORI_TEST_DB_URL YORIJORI_TEST_DB_USERNAME YORIJORI_TEST_DB_PASSWORD
 - 현재 수량은 DOUBLE이다. 정확한 단위·분수 연산을 확장할 때 Java와 함께 DECIMAL 전환을 검토한다.
 - 신규 인덱스는 현재 조회 조건에 맞춘 것이다. 운영 데이터의 EXPLAIN과 지연 시간을 보고 평가한다.
 - 재학습은 consent=true인 기록만 사용한다. 이번 변경은 학습 데이터 추출이나 동의 변경을 구현하지 않는다.
+
+## V5 관계·이력 이관
+
+V1~V4를 수정하지 않고 V5를 적용한다. 구버전 앱은 GROUP 선택을 user_avoid에 쓰므로,
+쓰기 중단 후 V5와 새 애플리케이션을 함께 배포한다. V5 DB에 구버전 앱을 그대로 연결하지 않는다.
+적용 전 V4 점검에 더해 다음 SQL을 실행한다.
+
+```bash
+docker compose -f compose.db.yml exec -T db sh -c \
+  'MYSQL_PWD="$MYSQL_PASSWORD" exec mysql -uyorijori yorijori' < docs/erd/preflight-v5.sql
+```
+
+결과가 있으면 분류 이름·종류를 확인한 후 이관한다. V5는 알 수 없는 GROUP 선택을
+조용히 버리지 않고 NOT NULL 위반으로 중단한다. GROUP 선택은 user_avoid_group으로
+옮겨지고 user_avoid에는 ITEM만 남는다. 원본 백업과 새 분류 선택 건수를 비교한다.
+
+기존 재고는 OPENING(0→현재 수량) 1건씩 기록한다. 시각은 migration 적용 시각이며
+과거 등록·수정 이력이나 행위자를 복원한 것이 아니다. 이후 ADD/ADJUST/COOK/TOSS를
+변경과 같은 트랜잭션에서 기록한다. 행 잠금으로 같은 재고 행의 수정·차감을 직렬화한다.
+단위를 바꾸거나 다른 재고를 합산할 때는 원장의 단위 스냅샷을 함께 확인한다.
+원장이 참조하는 냉장고는 삭제가 차단된다. 재고 행이 삭제되면 fridge_item_id만 NULL이 되고
+item_ref_id·이름·단위·수량 변화는 보존된다.
+
+과거 요리 기록의 냉장고는 현재 남아 있는 dish로 확인되는 경우만 연결한다.
+재료 ID도 표준 이름이 정확히 일치하는 경우만 연결한다. 알 수 없는 과거 관계를
+현재 회원의 소속으로 추정하지 않는다. 과거 가격에는 외부 상품 ID를 추정해 채우지 않는다.
+
+scan_model에는 기존 클래스/피드백의 모든 버전을 이관한다. 새 모델은 클래스와 피드백보다
+먼저 scan_model에 등록한다. artifact_path와 released_at은 확인된 값만 입력한다.
+미등록 모델 피드백은 400 INVALID_INPUT으로 거절한다. 모호한 예측 클래스는 NULL로 둔다.
+상품 포장 수량·단위는 확인 후 함께 입력하며, 현재 가격은 포장 수량당으로 정규화하지 않는다.
+외부 상품 ID가 없거나 길이가 범위를 벗어나면 product_id=NULL로 가격 관측 자체는 보존한다.
+
+V5 이관 테스트는 별도 빈 DB에서 다음처럼 실행한다. 기본 H2 외에 MySQL을 선택할 수 있다.
+
+```bash
+export YORIJORI_RELATION_DB_URL='jdbc:mysql://127.0.0.1:3307/yorijori?serverTimezone=Asia/Seoul&characterEncoding=UTF-8'
+export YORIJORI_RELATION_DB_USERNAME=yorijori
+export YORIJORI_RELATION_DB_PASSWORD="$MYSQL_PASSWORD"
+cd backend
+bash ./gradlew test --tests '*DatabaseRelationsMigrationTest' --rerun-tasks --no-daemon
+unset YORIJORI_RELATION_DB_URL YORIJORI_RELATION_DB_USERNAME YORIJORI_RELATION_DB_PASSWORD
+```
+
+MySQL은 DDL 부분 적용을 자동 롤백하지 않는다. 특히 GROUP 이관 뒤 후속 단계가 실패했다면
+선택 건수·실제 테이블·Flyway 이력과 백업을 조사하고 검증된 복구 절차를 따른다.
+원장 및 새 테이블을 지워서 단순 재실행하는 방식은 사용하지 않는다.

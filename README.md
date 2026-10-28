@@ -335,7 +335,7 @@ yorijori/
 - 재료는 **이름이 아니라 `ingredient_id`로 연결**. 기준표에 없는 재료는 이름만 저장할 수 있게 열어 둠
 - 스키마 변경은 `V{번호}__설명.sql`로 추가, 이미 반영된 파일은 수정 금지
 
-### 테이블 (예상이며, 추후 추가 및 수정 필요)
+### 테이블 (Flyway V5 기준)
 
 | 그룹 | 테이블 | 설명 |
 |---|---|---|
@@ -344,19 +344,23 @@ yorijori/
 | 기준 | `recipe` | 레시피 (조리 시간, 난이도, 인분, 분류, 칼로리, 보관 일수, 영상 ID) |
 | 기준 | `recipe_ingredient` | 레시피 재료 (주재료/부재료/양념, 선택 여부, 분량 원문) |
 | 기준 | `recipe_step` | 조리 순서 |
+| 기준 | `scan_model` | 인식 모델 버전 레지스트리 |
+| 기준 | `product` | 외부 채널 상품 ID와 재료 연결 |
 | 기준 | `scan_class` | 모델 클래스 ↔ 재료, 모델 버전 |
 | 기준 | `avoid_group`, `avoid_group_term` | 알레르기 묶음과 실제로 확인하는 이름 (대두 → 두부·콩·된장·간장…) (v9) |
 | 사용자 | `users` | 회원 |
-| 사용자 | `user_avoid` | 못 먹는 재료 (묶음 / 직접 입력) (v9) |
+| 사용자 | `user_avoid` | 직접 입력한 회피 재료 |
+| 사용자 | `user_avoid_group` | 회원별 알레르기 분류 선택 (ID 관계) |
 | 사용자 | `fridge`, `fridge_member` | 냉장고와 구성원 (가족 공유 대비) |
 | 사용자 | `fridge_item` | 냉장고 재료 (수량, 등록일, 소비기한, 자동 안내 여부) |
 | 사용자 | `dish` | 만든 요리 (만든 인분, 남은 인분, 보관 기한) |
 | 사용자 | `cart_item` | 장보기 (목표가, 알림 여부) |
 | 기록 | `cooking_log`, `cooking_log_ingredient` | 만듦·먹음·버림 기록, 사용 재료와 당시 남은 일수 |
+| 기록 | `inventory_movement` | 등록·수정·차감·폐기 재고 원장 |
 | 기록 | `price_history` | 재료별·쇼핑몰별 가격 이력 |
 | 기록 | `scan_feedback` | 인식 결과 수정 기록 (재학습 동의 여부 포함) |
 
-전체 컬럼: [docs/erd](docs/erd/README.md)
+전체 컬럼과 V5 관계·이관·운영 안내: [docs/erd](docs/erd/README.md)
 
 ```mermaid
 erDiagram
@@ -378,6 +382,13 @@ erDiagram
   RECIPE ||--o{ DISH : "cooked as"
   RECIPE ||--o{ COOKING_LOG : about
   COOKING_LOG ||--o{ COOKING_LOG_INGREDIENT : used
+  USERS ||--o{ USER_AVOID_GROUP : selects
+  AVOID_GROUP ||--o{ USER_AVOID_GROUP : selected
+  FRIDGE ||--o{ INVENTORY_MOVEMENT : tracks
+  FRIDGE_ITEM |o--o{ INVENTORY_MOVEMENT : changed
+  SCAN_MODEL ||--o{ SCAN_CLASS : defines
+  SCAN_MODEL ||--o{ SCAN_FEEDBACK : evaluates
+  PRODUCT |o--o{ PRICE_HISTORY : observed
 ```
 
 ---

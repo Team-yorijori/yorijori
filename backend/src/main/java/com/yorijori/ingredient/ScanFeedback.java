@@ -39,6 +39,19 @@ public class ScanFeedback {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "predicted_class_id")
+    private ScanClass predictedClass;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "corrected_ingredient_id")
+    private Ingredient correctedIngredient;
+
+    public void link(ScanClass predictedClass, Ingredient correctedIngredient) {
+        this.predictedClass = predictedClass;
+        this.correctedIngredient = correctedIngredient;
+    }
+
     protected ScanFeedback() {}
 
     public ScanFeedback(Long userId, String modelVersion, String predicted, String corrected, Double score, boolean consent) {

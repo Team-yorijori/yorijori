@@ -4,6 +4,7 @@ import com.yorijori.common.exception.ApiException;
 import com.yorijori.common.exception.ErrorCode;
 import com.yorijori.fridge.FridgeService;
 import com.yorijori.ingredient.AvoidGroupService;
+import com.yorijori.ingredient.AvoidGroup;
 import com.yorijori.user.dto.AvoidSettings;
 import com.yorijori.user.dto.SignupRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,14 +21,16 @@ public class UserService {
 
     private final UserRepository users;
     private final UserAvoidRepository avoids;
+    private final UserAvoidGroupRepository selectedGroups;
     private final PasswordEncoder encoder;
     private final FridgeService fridgeService;
     private final AvoidGroupService avoidGroups;
 
-    public UserService(UserRepository users, UserAvoidRepository avoids, PasswordEncoder encoder,
+    public UserService(UserRepository users, UserAvoidRepository avoids, UserAvoidGroupRepository selectedGroups, PasswordEncoder encoder,
                        FridgeService fridgeService, AvoidGroupService avoidGroups) {
         this.users = users;
         this.avoids = avoids;
+        this.selectedGroups = selectedGroups;
         this.encoder = encoder;
         this.fridgeService = fridgeService;
         this.avoidGroups = avoidGroups;
@@ -59,7 +62,7 @@ public class UserService {
     public AvoidSettings getAvoid(Long userId) {
         List<UserAvoid> list = avoids.findByUserId(userId);
         return new AvoidSettings(
-                list.stream().filter(a -> a.getKind() == UserAvoid.Kind.GROUP).map(UserAvoid::getValue).toList(),
+                selectedGroups.findByUserIdOrderByIdAsc(userId).stream().map(a -> a.getGroup().getName()).toList(),
                 list.stream().filter(a -> a.getKind() == UserAvoid.Kind.ITEM).map(UserAvoid::getValue).toList(),
                 get(userId).isAvoidShow());
     }
@@ -67,27 +70,32 @@ public class UserService {
     /** 통째로 바꾼다 (화면에서 칩을 누를 때마다 전체를 보낸다) */
     @Transactional
     public AvoidSettings saveAvoid(Long userId, AvoidSettings req) {
+        User user = get(userId);
+        List<AvoidGroup> groups = new LinkedHashSet<>(nullSafe(req.groups())).stream()
+                .map(avoidGroups::getByName).toList();
+        selectedGroups.deleteByUserId(userId);
+        selectedGroups.flush();
         avoids.deleteByUserId(userId);
         avoids.flush();
-        Set<String> known = avoidGroups.groupNames();
-        for (String g : new LinkedHashSet<>(nullSafe(req.groups()))) {
-            if (!known.contains(g)) throw new ApiException(ErrorCode.INVALID_INPUT, "알 수 없는 알레르기 묶음: " + g);
-            avoids.save(new UserAvoid(userId, UserAvoid.Kind.GROUP, g));
+        for (AvoidGroup group : groups) {
+            selectedGroups.save(new UserAvoidGroup(userId, group));
         }
-        for (String it : new LinkedHashSet<>(nullSafe(req.items()))) {
-            String name = it.trim();
-            if (!name.isEmpty() && name.length() <= 50) avoids.save(new UserAvoid(userId, UserAvoid.Kind.ITEM, name));
+        for (String name : nullSafe(req.items()).stream().filter(java.util.Objects::nonNull)
+                .map(String::trim).filter(it -> !it.isEmpty() && it.length() <= 50).distinct().toList()) {
+            avoids.save(new UserAvoid(userId, UserAvoid.Kind.ITEM, name));
         }
-        get(userId).setAvoidShow(req.show());
+        user.setAvoidShow(req.show());
         return getAvoid(userId);
     }
 
     /** 추천·경고에 쓰는 실제 이름 목록: 묶음을 펼친 이름 + 직접 넣은 이름 */
     public List<String> avoidTerms(Long userId) {
         Set<String> terms = new LinkedHashSet<>();
+        for (UserAvoidGroup selection : selectedGroups.findByUserIdOrderByIdAsc(userId)) {
+            terms.addAll(selection.getGroup().getTerms());
+        }
         for (UserAvoid a : avoids.findByUserId(userId)) {
-            if (a.getKind() == UserAvoid.Kind.GROUP) terms.addAll(avoidGroups.termsOf(a.getValue()));
-            else terms.add(a.getValue());
+            if (a.getKind() == UserAvoid.Kind.ITEM) terms.add(a.getValue());
         }
         return List.copyOf(terms);
     }

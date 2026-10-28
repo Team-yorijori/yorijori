@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ScanClassRepository extends JpaRepository<ScanClass, Long> {
     List<ScanClass> findByModelVersionOrderByClassIdAsc(String modelVersion);
+    List<ScanClass> findByModelVersionAndIngredientId(String modelVersion, Long ingredientId);
 }

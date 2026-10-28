@@ -1,6 +1,8 @@
 package com.yorijori.ingredient;
 
 import com.yorijori.ingredient.dto.AvoidGroupResponse;
+import com.yorijori.common.exception.ApiException;
+import com.yorijori.common.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,11 @@ public class AvoidGroupService {
 
     public Set<String> groupNames() {
         return groups.findAll().stream().map(AvoidGroup::getName).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public AvoidGroup getByName(String name) {
+        return groups.findByName(name).orElseThrow(() ->
+                new ApiException(ErrorCode.INVALID_INPUT, "알 수 없는 알레르기 묶음: " + name));
     }
 
     public List<String> termsOf(String groupName) {

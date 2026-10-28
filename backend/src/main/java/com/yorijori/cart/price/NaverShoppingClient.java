@@ -56,7 +56,7 @@ public class NaverShoppingClient {
                     .filter(i -> i.path("lprice").asInt(0) > 0)
                     .min(Comparator.comparingInt(i -> i.path("lprice").asInt()))
                     .map(i -> new ShopPrice("NAVER", i.path("mallName").asText(null), i.path("lprice").asInt(),
-                            i.path("title").asText("").replaceAll("<[^>]+>", ""), i.path("link").asText(null)));
+                            i.path("title").asText("").replaceAll("<[^>]+>", ""), i.path("link").asText(null), i.path("productId").asText(null)));
         } catch (RestClientException e) {
             log.warn("네이버 쇼핑 검색 실패: {} — {}", keyword, e.getMessage());
             return Optional.empty();

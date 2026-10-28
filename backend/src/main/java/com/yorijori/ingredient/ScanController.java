@@ -1,6 +1,8 @@
 package com.yorijori.ingredient;
 
 import com.yorijori.common.config.AppProperties;
+import com.yorijori.common.exception.ApiException;
+import com.yorijori.common.exception.ErrorCode;
 import com.yorijori.common.response.ApiResponse;
 import com.yorijori.common.security.LoginUser;
 import com.yorijori.ingredient.dto.ScanClassResponse;
@@ -24,11 +26,15 @@ public class ScanController {
     private final ScanClassRepository classes;
     private final ScanFeedbackRepository feedbacks;
     private final AppProperties props;
+    private final ScanModelRepository models;
+    private final IngredientService ingredients;
 
-    public ScanController(ScanClassRepository classes, ScanFeedbackRepository feedbacks, AppProperties props) {
+    public ScanController(ScanClassRepository classes, ScanFeedbackRepository feedbacks, AppProperties props, ScanModelRepository models, IngredientService ingredients) {
         this.classes = classes;
         this.feedbacks = feedbacks;
         this.props = props;
+        this.models = models;
+        this.ingredients = ingredients;
     }
 
     @GetMapping("/classes")
@@ -41,10 +47,19 @@ public class ScanController {
     @PostMapping("/feedback")
     @Transactional
     public ApiResponse<Integer> feedback(@AuthenticationPrincipal LoginUser me, @Valid @RequestBody ScanFeedbackRequest req) {
+        if (!models.existsById(req.modelVersion())) {
+            throw new ApiException(ErrorCode.INVALID_INPUT, "등록되지 않은 인식 모델 버전입니다.");
+        }
         int n = 0;
         for (ScanFeedbackRequest.Row r : req.rows()) {
             if (r.predicted().equals(r.corrected())) continue;
-            feedbacks.save(new ScanFeedback(me.getId(), req.modelVersion(), r.predicted(), r.corrected(), r.score(), req.consent()));
+            ScanClass predictedClass = ingredients.resolve(r.predicted())
+                    .map(i -> classes.findByModelVersionAndIngredientId(req.modelVersion(), i.getId()))
+                    .filter(matches -> matches.size() == 1)
+                    .map(matches -> matches.get(0)).orElse(null);
+            ScanFeedback feedback = new ScanFeedback(me.getId(), req.modelVersion(), r.predicted(), r.corrected(), r.score(), req.consent());
+            feedback.link(predictedClass, ingredients.resolve(r.corrected()).orElse(null));
+            feedbacks.save(feedback);
             n++;
         }
         return ApiResponse.ok(n);

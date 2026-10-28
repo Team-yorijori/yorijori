@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -30,15 +31,17 @@ public class FridgeService {
     private final IngredientService ingredientService;
     private final CookingLogRepository logs;
     private final Clock clock;
+    private final InventoryMovementRepository movements;
 
     public FridgeService(FridgeRepository fridges, FridgeMemberRepository members, FridgeItemRepository items,
-                         IngredientService ingredientService, CookingLogRepository logs, Clock clock) {
+                         IngredientService ingredientService, CookingLogRepository logs, Clock clock, InventoryMovementRepository movements) {
         this.fridges = fridges;
         this.members = members;
         this.items = items;
         this.ingredientService = ingredientService;
         this.logs = logs;
         this.clock = clock;
+        this.movements = movements;
     }
 
     public LocalDate today() { return LocalDate.now(clock); }
@@ -90,6 +93,7 @@ public class FridgeService {
             String unit = ing.map(Ingredient::getUnit).orElse("개");
             String source = it.source() == null ? "MANUAL" : it.source();
             FridgeItem saved = items.save(new FridgeItem(fridgeId, ing.orElse(null), name, qty, unit, today, exp, auto, source));
+            recordMovement(saved, userId, null, InventoryMovement.EventType.ADD, 0, saved.getQty());
             out.add(new AddItemResult(FridgeItemResponse.of(saved, today), msg));
         }
         return out;
@@ -97,9 +101,13 @@ public class FridgeService {
 
     @Transactional
     public FridgeItemResponse update(Long userId, Long itemId, UpdateItemRequest req) {
-        FridgeItem f = items.findByIdAndFridgeId(itemId, fridgeIdOf(userId))
+        FridgeItem f = items.findForUpdateByIdAndFridgeId(itemId, fridgeIdOf(userId))
                 .orElseThrow(() -> new ApiException(ErrorCode.ITEM_NOT_FOUND));
+        double before = f.getQty();
         if (req.qty() != null) f.changeQty(req.qty());
+        if (Double.compare(before, f.getQty()) != 0) {
+            recordMovement(f, userId, null, InventoryMovement.EventType.ADJUST, before, f.getQty());
+        }
         if (Boolean.TRUE.equals(req.resetAuto())) {
             int days = f.getIngredient() == null ? IngredientService.UNKNOWN_DAYS : f.getIngredient().getFridgeDays();
             f.changeExp(f.getRegDate().plusDays(days), true);
@@ -113,9 +121,11 @@ public class FridgeService {
     /** 재료 버리기 — 기록을 남긴다 (이번 달 "버린 것" 통계) */
     @Transactional
     public void toss(Long userId, Long itemId) {
-        FridgeItem f = items.findByIdAndFridgeId(itemId, fridgeIdOf(userId))
+        FridgeItem f = items.findForUpdateByIdAndFridgeId(itemId, fridgeIdOf(userId))
                 .orElseThrow(() -> new ApiException(ErrorCode.ITEM_NOT_FOUND));
-        logs.save(CookingLog.tossIngredient(userId, f.getName(), f.getQty(), today()));
+        CookingLog log = CookingLog.tossIngredient(userId, f.getName(), f.getQty(), today()).inFridge(f.getFridgeId());
+        logs.save(log);
+        recordMovement(f, userId, log.getId(), InventoryMovement.EventType.TOSS, f.getQty(), 0);
         items.delete(f);
     }
 
@@ -139,14 +149,23 @@ public class FridgeService {
      * @return 실제로 뺀 양
      */
     @Transactional
-    public double deduct(Long fridgeId, String name, double need) {
+    public double deduct(Long userId, Long fridgeId, String name, double need, Long cookingLogId) {
         double left = need, taken = 0;
         for (FridgeItem f : items.findByFridgeIdAndNameAndQtyGreaterThanOrderByExpDateAscIdAsc(fridgeId, name, 0)) {
             if (left <= 0) break;
+            double before = f.getQty();
             double t = f.take(left);
+            if (Double.compare(before, f.getQty()) != 0) {
+                recordMovement(f, userId, cookingLogId, InventoryMovement.EventType.COOK, before, f.getQty());
+            }
             left -= t; taken += t;
         }
         items.deleteEmpty(fridgeId);
         return taken;
+    }
+
+    private void recordMovement(FridgeItem item, Long actor, Long logId, InventoryMovement.EventType type,
+                                double before, double after) {
+        movements.save(new InventoryMovement(item, actor, logId, type, before, after, LocalDateTime.now(clock)));
     }
 }

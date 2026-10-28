@@ -1,23 +1,24 @@
 erDiagram
   INGREDIENT {
     bigint id PK
-    varchar name
-    varchar category "채소 · 과일 · 육류 · 해산물 · 유제품·알 · 가공식품 · 반찬 ·"
-    int fridge_days "냉장 보관 일수 (소비기한 자동 안내, 참고용)"
+    varchar name UK
+    varchar category
+    int fridge_days
     varchar unit
     double default_qty
-    varchar color "접시 그림 색"
-    int each_gram "영수증 무게 → 개수 환산 (1개당 g)"
+    varchar color
+    int each_gram
   }
   INGREDIENT_ALIAS {
     bigint id PK
     bigint ingredient_id FK
-    varchar alias
-    varchar source "SYNONYM · RECEIPT"
+    varchar alias UK
+    varchar source
   }
+  INGREDIENT ||--o{ INGREDIENT_ALIAS : "ingredient_id"
   AVOID_GROUP {
     bigint id PK
-    varchar name
+    varchar name UK
     int sort_no
     varchar warning
   }
@@ -26,57 +27,63 @@ erDiagram
     int sort_no PK
     varchar term
   }
+  AVOID_GROUP ||--o{ AVOID_GROUP_TERM : "group_id"
   RECIPE {
     bigint id PK
-    varchar code "화면에서 쓰는 id (r1, kimchi-rice …)"
+    varchar code UK
     varchar title
     varchar description
     int cook_time_min
-    varchar difficulty "초보환영 · 보통 · 어려움 · 쉬움"
+    varchar difficulty
     int servings
-    varchar category "밥 · 국 · 찌개/전골/스튜 · 볶음 …"
-    varchar cuisine "한식 · 서양 · 중국 · 일본 …"
+    varchar category
+    varchar cuisine
     varchar kcal
     varchar source
-    varchar video_id "YouTube 대표 영상 (YoutubeVideoCollector)"
-    int storage_days "만든 요리 냉장 보관 일수 (참고용)"
+    varchar video_id
+    int storage_days
     varchar image_url
   }
   RECIPE_INGREDIENT {
     bigint id PK
     bigint recipe_id FK
-    bigint ingredient_id FK "기준표에 있으면 연결"
-    varchar ingredient_name "표준 재료명. 냉장고 재료와 이 이름으로 매칭"
-    double amount "냉장고 단위 수량 (차감 기본값)"
-    varchar amount_text "원래 표기 (양지머리 100g)"
-    varchar ingredient_type "MAIN · SUB · SEASONING"
+    bigint ingredient_id FK "NULL 허용"
+    varchar ingredient_name
+    double amount
+    varchar amount_text
+    varchar ingredient_type
     boolean is_optional
     int sort_no
   }
+  RECIPE ||--o{ RECIPE_INGREDIENT : "recipe_id"
+  INGREDIENT |o--o{ RECIPE_INGREDIENT : "ingredient_id"
   RECIPE_STEP {
     bigint id PK
     bigint recipe_id FK
     int step_no
     varchar content
   }
+  RECIPE ||--o{ RECIPE_STEP : "recipe_id"
   SCAN_CLASS {
     bigint id PK
-    varchar model_version "v3 · v4"
-    int class_id "모델 출력 classId"
+    varchar model_version FK
+    int class_id
     varchar en_name
     bigint ingredient_id FK
-    double auto_threshold "이 점수 이상이면 자동 체크"
-    varchar confuse_with "혹시 ○○? 버튼 (쉼표 구분)"
-    double map50 "검증 mAP50 (참고)"
+    double auto_threshold
+    varchar confuse_with
+    double map50
   }
+  SCAN_MODEL ||--o{ SCAN_CLASS : "model_version"
+  INGREDIENT ||--o{ SCAN_CLASS : "ingredient_id"
   USERS {
     bigint id PK
-    varchar email
+    varchar email UK
     varchar password_hash
     varchar nickname
     varchar role
-    boolean avoid_show "v9 못 먹는 재료: 빼지 않고 표시만"
-    boolean anim_on "v7 애니메이션"
+    boolean avoid_show
+    boolean anim_on
     datetime created_at
   }
   USER_AVOID {
@@ -85,6 +92,7 @@ erDiagram
     varchar kind
     varchar avoid_value
   }
+  USERS ||--o{ USER_AVOID : "user_id"
   FRIDGE {
     bigint id PK
     varchar name
@@ -94,25 +102,29 @@ erDiagram
     bigint id PK
     bigint fridge_id FK
     bigint user_id FK
-    varchar role "OWNER · MEMBER"
+    varchar role
   }
+  FRIDGE ||--o{ FRIDGE_MEMBER : "fridge_id"
+  USERS ||--o{ FRIDGE_MEMBER : "user_id"
   FRIDGE_ITEM {
     bigint id PK
     bigint fridge_id FK
-    bigint ingredient_id FK
+    bigint ingredient_id FK "NULL 허용"
     varchar name
     double qty
     varchar unit
     date reg_date
     date exp_date
-    boolean exp_auto "TRUE: 보관 일수로 계산한 참고용 날짜"
-    varchar source "MANUAL · SCAN · RECEIPT · CART"
+    boolean exp_auto
+    varchar source
     datetime created_at
   }
+  FRIDGE ||--o{ FRIDGE_ITEM : "fridge_id"
+  INGREDIENT |o--o{ FRIDGE_ITEM : "ingredient_id"
   DISH {
     bigint id PK
     bigint fridge_id FK
-    bigint recipe_id FK
+    bigint recipe_id FK "NULL 허용"
     varchar recipe_code
     varchar name
     int servings
@@ -120,13 +132,15 @@ erDiagram
     date made_date
     date exp_date
     varchar colors
-    varchar saved_names "이 요리로 살린 임박 재료"
+    varchar saved_names
     datetime created_at
   }
+  FRIDGE ||--o{ DISH : "fridge_id"
+  RECIPE |o--o{ DISH : "recipe_id"
   CART_ITEM {
     bigint id PK
     bigint user_id FK
-    bigint ingredient_id FK
+    bigint ingredient_id FK "NULL 허용"
     varchar name
     int target_price
     boolean notify
@@ -137,6 +151,8 @@ erDiagram
     int notified_price
     datetime created_at
   }
+  USERS ||--o{ CART_ITEM : "user_id"
+  INGREDIENT |o--o{ CART_ITEM : "ingredient_id"
   COOKING_LOG {
     bigint id PK
     bigint user_id FK
@@ -144,18 +160,24 @@ erDiagram
     varchar recipe_code
     bigint dish_id
     varchar name
-    double amount "인분 또는 재료 수량"
+    double amount
     varchar saved_names
     date log_date
     datetime created_at
+    bigint fridge_id FK "NULL 허용"
   }
+  USERS ||--o{ COOKING_LOG : "user_id"
+  FRIDGE |o--o{ COOKING_LOG : "fridge_id"
   COOKING_LOG_INGREDIENT {
     bigint id PK
     bigint log_id FK
     varchar ingredient_name
     double qty
-    bigint days_left "그때 남은 소비기한 일수"
+    bigint days_left
+    bigint ingredient_id FK "NULL 허용"
   }
+  COOKING_LOG ||--o{ COOKING_LOG_INGREDIENT : "log_id"
+  INGREDIENT |o--o{ COOKING_LOG_INGREDIENT : "ingredient_id"
   PRICE_HISTORY {
     bigint id PK
     varchar ingredient_name
@@ -165,32 +187,71 @@ erDiagram
     varchar product_title
     varchar product_url
     datetime checked_at
+    bigint ingredient_id FK "NULL 허용"
+    bigint product_id FK "NULL 허용"
   }
+  INGREDIENT |o--o{ PRICE_HISTORY : "ingredient_id"
+  PRODUCT |o--o{ PRICE_HISTORY : "product_id"
   SCAN_FEEDBACK {
     bigint id PK
     bigint user_id FK "NULL 허용"
-    varchar model_version
+    varchar model_version FK
     varchar predicted
     varchar corrected
     double score
     boolean consent
     datetime created_at
+    bigint predicted_class_id FK "NULL 허용"
+    bigint corrected_ingredient_id FK "NULL 허용"
   }
-  INGREDIENT ||--o{ INGREDIENT_ALIAS : "ingredient_id"
-  AVOID_GROUP ||--o{ AVOID_GROUP_TERM : "group_id"
-  RECIPE ||--o{ RECIPE_INGREDIENT : "recipe_id"
-  INGREDIENT |o--o{ RECIPE_INGREDIENT : "ingredient_id"
-  RECIPE ||--o{ RECIPE_STEP : "recipe_id"
-  INGREDIENT ||--o{ SCAN_CLASS : "ingredient_id"
-  USERS ||--o{ USER_AVOID : "user_id"
-  FRIDGE ||--o{ FRIDGE_MEMBER : "fridge_id"
-  USERS ||--o{ FRIDGE_MEMBER : "user_id"
-  FRIDGE ||--o{ FRIDGE_ITEM : "fridge_id"
-  INGREDIENT |o--o{ FRIDGE_ITEM : "ingredient_id"
-  FRIDGE ||--o{ DISH : "fridge_id"
-  RECIPE |o--o{ DISH : "recipe_id"
-  USERS ||--o{ CART_ITEM : "user_id"
-  INGREDIENT |o--o{ CART_ITEM : "ingredient_id"
-  USERS ||--o{ COOKING_LOG : "user_id"
-  COOKING_LOG ||--o{ COOKING_LOG_INGREDIENT : "log_id"
-  USERS |o--o{ SCAN_FEEDBACK : "user_id (V4)"
+  USERS |o--o{ SCAN_FEEDBACK : "user_id"
+  SCAN_MODEL ||--o{ SCAN_FEEDBACK : "model_version"
+  SCAN_CLASS |o--o{ SCAN_FEEDBACK : "predicted_class_id"
+  INGREDIENT |o--o{ SCAN_FEEDBACK : "corrected_ingredient_id"
+  USER_AVOID_GROUP {
+    bigint id PK
+    bigint user_id FK
+    bigint group_id FK
+  }
+  USERS ||--o{ USER_AVOID_GROUP : "user_id"
+  AVOID_GROUP ||--o{ USER_AVOID_GROUP : "group_id"
+  SCAN_MODEL {
+    varchar version PK
+    varchar display_name
+    varchar artifact_path
+    datetime released_at
+    datetime created_at
+  }
+  PRODUCT {
+    bigint id PK
+    varchar channel
+    varchar external_id
+    varchar title
+    varchar product_url
+    bigint ingredient_id FK "NULL 허용"
+    decimal package_qty
+    varchar package_unit
+  }
+  INGREDIENT |o--o{ PRODUCT : "ingredient_id"
+  INVENTORY_MOVEMENT {
+    bigint id PK
+    bigint fridge_id FK
+    bigint fridge_item_id FK "NULL 허용"
+    bigint item_ref_id
+    bigint ingredient_id FK "NULL 허용"
+    bigint actor_user_id FK "NULL 허용"
+    bigint cooking_log_id FK "NULL 허용"
+    varchar item_name
+    varchar unit
+    varchar event_type
+    double qty_before
+    double qty_after
+    double qty_delta
+    varchar source
+    datetime occurred_at
+  }
+  FRIDGE ||--o{ INVENTORY_MOVEMENT : "fridge_id"
+  FRIDGE_ITEM |o--o{ INVENTORY_MOVEMENT : "fridge_item_id"
+  INGREDIENT |o--o{ INVENTORY_MOVEMENT : "ingredient_id"
+  USERS |o--o{ INVENTORY_MOVEMENT : "actor_user_id"
+  COOKING_LOG |o--o{ INVENTORY_MOVEMENT : "cooking_log_id"

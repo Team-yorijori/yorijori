@@ -2,8 +2,6 @@ package com.yorijori.cart.price;
 
 import com.yorijori.cart.CartItem;
 import com.yorijori.cart.CartItemRepository;
-import com.yorijori.cart.PriceHistory;
-import com.yorijori.cart.PriceHistoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,14 +24,14 @@ public class PriceCheckScheduler {
 
     private final NaverShoppingClient naver;
     private final CartItemRepository carts;
-    private final PriceHistoryRepository history;
+    private final PriceObservationService observations;
     private final PriceNotifier notifier;
 
     public PriceCheckScheduler(NaverShoppingClient naver, CartItemRepository carts,
-                               PriceHistoryRepository history, PriceNotifier notifier) {
+                               PriceObservationService observations, PriceNotifier notifier) {
         this.naver = naver;
         this.carts = carts;
-        this.history = history;
+        this.observations = observations;
         this.notifier = notifier;
     }
 
@@ -49,7 +47,7 @@ public class PriceCheckScheduler {
             if (p.isEmpty()) continue;
             found++;
             ShopPrice sp = p.get();
-            history.save(new PriceHistory(name, sp.channel(), sp.mallName(), sp.price(), sp.title(), sp.url(), now));
+            observations.observe(name, sp, now);
             for (CartItem c : carts.findByName(name)) {
                 c.updateLowest(sp.price(), sp.mallName(), sp.url(), now);
                 if (c.shouldNotify()) {

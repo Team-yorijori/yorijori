@@ -81,6 +81,8 @@ public class Dish {
         return servingsLeft;
     }
 
+    public void recordSaved(List<String> saved) { savedNames = String.join(",", saved); }
+
     public long daysLeft(LocalDate today) { return ChronoUnit.DAYS.between(today, expDate); }
 
     public Long getId() { return id; }

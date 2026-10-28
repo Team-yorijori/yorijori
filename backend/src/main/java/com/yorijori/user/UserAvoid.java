@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 
 /**
  * v9 못 먹는 재료 (알레르기·기피).
- * kind = GROUP → value 는 알레르기 묶음 이름(avoid_group.name, 예: "대두")
- * kind = ITEM  → value 는 사용자가 직접 넣은 재료 이름(예: "오이")
+ * 현재는 ITEM만 저장하며 value는 사용자가 직접 넣은 재료 이름(예: "오이")이다.
+ * 알레르기 묶음 선택은 UserAvoidGroup에서 ID로 연결한다.
+ * GROUP enum 값은 V5 이전 데이터 표현과의 호환을 위해 남겨 둔다.
  */
 @Entity
 @Table(name = "user_avoid",

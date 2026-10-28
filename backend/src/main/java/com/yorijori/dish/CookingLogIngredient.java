@@ -17,6 +17,9 @@ public class CookingLogIngredient {
     @Column(name = "ingredient_name", nullable = false, length = 50)
     private String ingredientName;
 
+    @Column(name="ingredient_id")
+    private Long ingredientId;
+
     @Column(nullable = false)
     private double qty;
 
@@ -25,9 +28,10 @@ public class CookingLogIngredient {
 
     protected CookingLogIngredient() {}
 
-    CookingLogIngredient(CookingLog log, String ingredientName, double qty, Long daysLeft) {
+    CookingLogIngredient(CookingLog log, String ingredientName, double qty, Long daysLeft, Long ingredientId) {
         this.log = log;
         this.ingredientName = ingredientName;
+        this.ingredientId = ingredientId;
         this.qty = qty;
         this.daysLeft = daysLeft;
     }

@@ -169,3 +169,13 @@ POST /api/recipes/r212/cook
 | `/fridge` · `/recipes` · `/dishes` · `/cart` · `/items` | My 냉장고 · AI 매칭 레시피 · 만든 요리 · 장보기 · 내 식재료 |
 | `/recipes/{code}` | 레시피 상세 |
 | `/login` · `/signup` | 로그인 · 회원가입 |
+
+## 8. DB V5 호환성과 검증
+
+기존 성공 응답 형식과 경로는 유지한다.
+
+- GET/PUT `/api/me/avoid`: groups는 계속 분류 이름 배열이다. 서버는 분류 ID 관계로 저장하므로 이름 변경 후에도 선택이 유지된다. 직접 입력 재료는 공백 제거 후 중복을 합치며 빈 값·NULL 항목을 제외한다.
+- POST `/api/scan/feedback`: modelVersion은 등록된 scan_model 버전이어야 한다. 미등록 버전, NULL 행, 빈 재료명, 50자를 넘는 이름, 0~1 밖의 score는 400 INVALID_INPUT이다. score=NULL은 허용한다. predicted/corrected 원문과 consent는 그대로 보존한다.
+- 재고 등록·수량 변경·요리 차감·폐기는 서버 내부 재고 원장에 함께 저장된다. 별도의 원장 조회 API는 이번 변경에 추가하지 않는다.
+- 수량을 소수 둘째 자리까지 반영한 후 실제 감소량을 사용 기록에 저장한다. 반올림 때문에 재고가 줄지 않았다면 사용 재료로 기록하지 않는다.
+- 장보기 가격 응답은 기존 계약을 유지한다. 내부적으로 외부 상품 ID와 가격 관측을 연결하며, 아직 포장 수량당 가격 비교는 제공하지 않는다.

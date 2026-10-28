@@ -43,7 +43,7 @@ class DatabaseIntegrityTest {
             s.executeUpdate("INSERT INTO price_history(id,ingredient_name,channel,price,checked_at) VALUES (900001,'청경채','TEST',1000,CURRENT_TIMESTAMP)");
             s.executeUpdate("INSERT INTO scan_feedback(id,user_id,model_version,predicted,corrected,consent) VALUES (900001,900001,'v4','배추','청경채',FALSE)");
         }
-        Flyway.configure().dataSource(url, username, password).load().migrate();
+        Flyway.configure().dataSource(url, username, password).target("4").load().migrate();
     }
 
     @BeforeEach
@@ -154,7 +154,7 @@ class DatabaseIntegrityTest {
     @Test
     void freshDatabaseMigratesThroughAllVersions() {
         Flyway fresh = Flyway.configure().dataSource("jdbc:h2:mem:fresh_" + UUID.randomUUID()
-                + ";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1", "sa", "").load();
+                + ";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1", "sa", "").target("4").load();
         assertThat(fresh.migrate().migrationsExecuted).isEqualTo(4);
         fresh.validate();
     }
