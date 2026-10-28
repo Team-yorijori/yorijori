@@ -79,7 +79,7 @@ public class FridgeItem {
     public double take(double need) {
         double before = qty;
         double t = Math.min(qty, Math.max(0, need));
-        qty = Math.max(0, Math.round((qty - t) * 100) / 100.0);
+        qty = Math.min(before, Math.max(0, Math.round((qty - t) * 100) / 100.0));
         return Math.max(0, before - qty);
     }
 

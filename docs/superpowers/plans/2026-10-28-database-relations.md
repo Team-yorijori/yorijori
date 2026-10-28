@@ -57,7 +57,7 @@ Consumes: spec의 product/scan_model 및 참조 컬럼.
 ### Task 5: 문서·실제 MySQL·검토·커밋
 
 Files: docs/erd/*, docs/api.md, spec/plan.
-- [ ] H2 전체와 새 빈 MySQL의 전체·증분 migration/API 검증.
-- [ ] 23개 테이블 ERD·사전·사전 점검 갱신.
-- [ ] 독립 검토, 중요한 문제 회귀 테스트 후 수정.
-- [ ] 기존 migration 보존·diff check·비밀파일 검사 후 한국어 커밋.
+- [x] H2 전체와 새 빈 MySQL의 전체·증분 migration/API 검증.
+- [x] 23개 테이블 ERD·사전·사전 점검 갱신.
+- [x] 독립 검토, 중요한 문제 회귀 테스트 후 수정.
+- [x] 기존 migration 보존·diff check·비밀파일 검사 후 한국어 커밋.

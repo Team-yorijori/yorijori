@@ -13,6 +13,10 @@ import com.yorijori.ingredient.IngredientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
+
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +36,7 @@ public class FridgeService {
     private final CookingLogRepository logs;
     private final Clock clock;
     private final InventoryMovementRepository movements;
+    @PersistenceContext private EntityManager entityManager;
 
     public FridgeService(FridgeRepository fridges, FridgeMemberRepository members, FridgeItemRepository items,
                          IngredientService ingredientService, CookingLogRepository logs, Clock clock, InventoryMovementRepository movements) {
@@ -103,6 +108,7 @@ public class FridgeService {
     public FridgeItemResponse update(Long userId, Long itemId, UpdateItemRequest req) {
         FridgeItem f = items.findForUpdateByIdAndFridgeId(itemId, fridgeIdOf(userId))
                 .orElseThrow(() -> new ApiException(ErrorCode.ITEM_NOT_FOUND));
+        entityManager.refresh(f, LockModeType.PESSIMISTIC_WRITE);
         double before = f.getQty();
         if (req.qty() != null) f.changeQty(req.qty());
         if (Double.compare(before, f.getQty()) != 0) {
@@ -123,6 +129,7 @@ public class FridgeService {
     public void toss(Long userId, Long itemId) {
         FridgeItem f = items.findForUpdateByIdAndFridgeId(itemId, fridgeIdOf(userId))
                 .orElseThrow(() -> new ApiException(ErrorCode.ITEM_NOT_FOUND));
+        entityManager.refresh(f, LockModeType.PESSIMISTIC_WRITE);
         CookingLog log = CookingLog.tossIngredient(userId, f.getName(), f.getQty(), today()).inFridge(f.getFridgeId());
         logs.save(log);
         recordMovement(f, userId, log.getId(), InventoryMovement.EventType.TOSS, f.getQty(), 0);
@@ -153,6 +160,8 @@ public class FridgeService {
         double left = need, taken = 0;
         for (FridgeItem f : items.findByFridgeIdAndNameAndQtyGreaterThanOrderByExpDateAscIdAsc(fridgeId, name, 0)) {
             if (left <= 0) break;
+            // stockMap이 미리 로드한 1차 캐시를 재사용하지 않고, 잠금 아래 최신 수량을 읽는다.
+            entityManager.refresh(f, LockModeType.PESSIMISTIC_WRITE);
             double before = f.getQty();
             double t = f.take(left);
             if (Double.compare(before, f.getQty()) != 0) {

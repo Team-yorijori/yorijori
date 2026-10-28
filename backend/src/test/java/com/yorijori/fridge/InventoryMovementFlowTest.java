@@ -98,4 +98,36 @@ class InventoryMovementFlowTest {
         }
         assertThat(jdbc.queryForObject("SELECT qty FROM fridge_item WHERE id=?",Double.class,id)).isEqualTo(previous);
     }
+
+    @Test
+    void consumingFractionalStockNeverIncreasesIt() {
+        long id=fridge.add(userId,new AddItemRequest(List.of(new AddItemRequest.Item("양파",0.006,null,"MANUAL")))).get(0).item().id();
+        var cooked=dishes.cook(userId,"r1",new CookRequest(1,List.of(new CookRequest.Use("양파",0.001))));
+        em.flush(); em.clear();
+        assertThat(cooked.deducted()).isZero();
+        assertThat(jdbc.queryForObject("SELECT qty FROM fridge_item WHERE id=?",Double.class,id)).isEqualTo(0.006);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM inventory_movement WHERE fridge_id=?",Long.class,fridgeId)).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional(propagation=org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    void cookingRefreshesPreloadedStockAfterConcurrentAdjustment() throws Exception {
+        long id=fridge.add(userId,new AddItemRequest(List.of(new AddItemRequest.Item("양파",10.0,null,"MANUAL")))).get(0).item().id();
+        var tx=new org.springframework.transaction.support.TransactionTemplate(transactionManager);
+        var pool=java.util.concurrent.Executors.newSingleThreadExecutor();
+        try {
+            tx.executeWithoutResult(status->{
+                // 요리 트랜잭션의 1차 캐시에 10개를 먼저 로드한다.
+                fridge.stockMap(fridgeId);
+                try {
+                    pool.submit(()->fridge.update(userId,id,new UpdateItemRequest(7.0,null,null)))
+                            .get(15,java.util.concurrent.TimeUnit.SECONDS);
+                } catch(Exception e) { throw new RuntimeException(e); }
+                dishes.cook(userId,"r1",new CookRequest(1,List.of(new CookRequest.Use("양파",2.0))));
+            });
+        } finally { pool.shutdownNow(); }
+        assertThat(jdbc.queryForObject("SELECT qty FROM fridge_item WHERE id=?",Double.class,id)).isEqualTo(5.0);
+        assertThat(jdbc.queryForList("SELECT qty_before FROM inventory_movement WHERE fridge_id=? ORDER BY id",Double.class,fridgeId)).containsExactly(0.0,10.0,7.0);
+        assertThat(jdbc.queryForList("SELECT qty_after FROM inventory_movement WHERE fridge_id=? ORDER BY id",Double.class,fridgeId)).containsExactly(10.0,7.0,5.0);
+    }
 }
