@@ -22,7 +22,7 @@ erDiagram
     varchar warning
   }
   AVOID_GROUP_TERM {
-    bigint group_id PK
+    bigint group_id PK, FK
     int sort_no PK
     varchar term
   }
@@ -168,7 +168,7 @@ erDiagram
   }
   SCAN_FEEDBACK {
     bigint id PK
-    bigint user_id
+    bigint user_id FK "NULL 허용"
     varchar model_version
     varchar predicted
     varchar corrected
@@ -179,17 +179,18 @@ erDiagram
   INGREDIENT ||--o{ INGREDIENT_ALIAS : "ingredient_id"
   AVOID_GROUP ||--o{ AVOID_GROUP_TERM : "group_id"
   RECIPE ||--o{ RECIPE_INGREDIENT : "recipe_id"
-  INGREDIENT ||--o{ RECIPE_INGREDIENT : "ingredient_id"
+  INGREDIENT |o--o{ RECIPE_INGREDIENT : "ingredient_id"
   RECIPE ||--o{ RECIPE_STEP : "recipe_id"
   INGREDIENT ||--o{ SCAN_CLASS : "ingredient_id"
   USERS ||--o{ USER_AVOID : "user_id"
   FRIDGE ||--o{ FRIDGE_MEMBER : "fridge_id"
   USERS ||--o{ FRIDGE_MEMBER : "user_id"
   FRIDGE ||--o{ FRIDGE_ITEM : "fridge_id"
-  INGREDIENT ||--o{ FRIDGE_ITEM : "ingredient_id"
+  INGREDIENT |o--o{ FRIDGE_ITEM : "ingredient_id"
   FRIDGE ||--o{ DISH : "fridge_id"
-  RECIPE ||--o{ DISH : "recipe_id"
+  RECIPE |o--o{ DISH : "recipe_id"
   USERS ||--o{ CART_ITEM : "user_id"
-  INGREDIENT ||--o{ CART_ITEM : "ingredient_id"
+  INGREDIENT |o--o{ CART_ITEM : "ingredient_id"
   USERS ||--o{ COOKING_LOG : "user_id"
   COOKING_LOG ||--o{ COOKING_LOG_INGREDIENT : "log_id"
+  USERS |o--o{ SCAN_FEEDBACK : "user_id (V4)"

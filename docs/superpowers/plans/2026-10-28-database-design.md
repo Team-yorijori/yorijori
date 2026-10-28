@@ -1,6 +1,6 @@
 # DB 보완 설계 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 기존 API와 호환되는 DB 무결성·조회·운영 구성을 검증하고 새 브랜치에 push한다.
 
@@ -40,13 +40,13 @@
 - Produces: 설계서의 named CHECK 15개, fk_feedback_user, 인덱스 3개.
 - Test DB: 기본 H2; YORIJORI_TEST_DB_URL/USERNAME/PASSWORD 지정 시 반드시 빈 별도 MySQL DB.
 
-- [ ] Step 1: INSERT/UPDATE 음수·범위 초과 거절, 허용 경계값, nullable FK, 고아 회원 거절, 스냅샷 보존 테스트 작성.
-- [ ] Step 2: `cd backend && bash ./gradlew test --tests '*DatabaseIntegrityTest' --no-daemon` 실행.
+- [x] Step 1: INSERT/UPDATE 음수·범위 초과 거절, 허용 경계값, nullable FK, 고아 회원 거절, 스냅샷 보존 테스트 작성.
+- [x] Step 2: `cd backend && bash ./gradlew test --tests '*DatabaseIntegrityTest' --no-daemon` 실행.
   Expected: 제약 부재로 ASSERTION 실패. 컴파일·설정 오류는 먼저 해결.
-- [ ] Step 3: V4 SQL 구현. 테스트에서 V3에 유효 fixture 삽입 → 최신 migrate → fixture 보존과 Flyway 4 확인.
-- [ ] Step 4: 같은 명령 및 전체 `bash ./gradlew test --no-daemon` 실행.
+- [x] Step 3: V4 SQL 구현. 테스트에서 V3에 유효 fixture 삽입 → 최신 migrate → fixture 보존과 Flyway 4 확인.
+- [x] Step 4: 같은 명령 및 전체 `bash ./gradlew test --no-daemon` 실행.
   Expected: 모든 테스트 통과, seed 70/33/560 유지.
-- [ ] Step 5: `git add`로 이 작업 파일과 승인된 spec/plan을 명시해 커밋.
+- [x] Step 5: `git add`로 이 작업 파일과 승인된 spec/plan을 명시해 커밋.
 
 ### Task 2: 사전 점검과 MySQL 운영 구성
 
@@ -60,13 +60,13 @@
 - Consumes: Task 1의 V4 제약 조건.
 - Produces: rule_name, row_id를 반환하는 읽기 전용 점검 SQL, MySQL 8.4 영속 볼륨·healthcheck, 실행·복구 안내.
 
-- [ ] Step 1: V3 DB에 무효 수량·가격·인분·모델 점수·고아 회원을 삽입하고 점검이 각 위반을 반환하는 테스트 작성.
-- [ ] Step 2: 테스트 실행; Expected: 점검 SQL 부재로 실패.
-- [ ] Step 3: UNION ALL 점검 SQL과 Docker Compose 작성. root 비밀번호는 환경변수 필수, 포트는 127.0.0.1, 볼륨 유지.
-- [ ] Step 4: preflight 테스트·전체 suite·`docker compose -f compose.db.yml config --quiet` 실행.
+- [x] Step 1: V3 DB에 무효 수량·가격·인분·모델 점수·고아 회원을 삽입하고 점검이 각 위반을 반환하는 테스트 작성.
+- [x] Step 2: 테스트 실행; Expected: 점검 SQL 부재로 실패.
+- [x] Step 3: UNION ALL 점검 SQL과 Docker Compose 작성. root 비밀번호는 환경변수 필수, 포트는 127.0.0.1, 볼륨 유지.
+- [x] Step 4: preflight 테스트·전체 suite·`docker compose -f compose.db.yml config --quiet` 실행.
   Expected: 정상 DB 무위반, fixture 위반 탐지, Compose 유효.
-- [ ] Step 5: Docker 데몬 사용 가능하면 새 전용 테스트 DB에서 Task 1 suite 실행. 기존 DB는 사용하지 않는다. 불가하면 명시.
-- [ ] Step 6: 이 작업 파일만 커밋.
+- [x] Step 5: Docker 데몬 사용 가능하면 새 전용 테스트 DB에서 Task 1 suite 실행. 기존 DB는 사용하지 않는다. 불가하면 명시.
+- [x] Step 6: 이 작업 파일만 커밋.
 
 ### Task 3: 설계 문서·ERD와 최종 검증·push
 
@@ -79,9 +79,9 @@
 - Consumes: V1 컬럼과 V4 제약·FK·인덱스.
 - Produces: 일치하는 컬럼 사전, nullable 관계를 반영한 ERD, 검증 결과.
 
-- [ ] Step 1: V1에서 19개 테이블 컬럼 사전 작성; V4 규칙과 참조 링크 추가.
-- [ ] Step 2: Mermaid의 선택 관계 수정 및 피드백 회원 관계 추가; PNG를 새 Mermaid에서 렌더링.
-- [ ] Step 3: 전체 테스트·git diff --check·비밀 파일 검사·V1~V3 diff 검증.
+- [x] Step 1: V1에서 19개 테이블 컬럼 사전 작성; V4 규칙과 참조 링크 추가.
+- [x] Step 2: Mermaid의 선택 관계 수정 및 피드백 회원 관계 추가; PNG를 새 Mermaid에서 렌더링.
+- [x] Step 3: 전체 테스트·git diff --check·비밀 파일 검사·V1~V3 diff 검증.
   Expected: 전체 통과, 기존 migration diff 없음.
 - [ ] Step 4: 새 검토자가 전체 diff와 spec/plan을 검토. 중요한 문제는 회귀 테스트 후 수정하고 전체 suite 실행.
 - [ ] Step 5: 문서와 최종 변경 커밋 후 `git push -u origin Loe/db-design`.
