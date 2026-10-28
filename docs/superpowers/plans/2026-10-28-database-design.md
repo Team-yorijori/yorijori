@@ -83,6 +83,6 @@
 - [x] Step 2: Mermaid의 선택 관계 수정 및 피드백 회원 관계 추가; PNG를 새 Mermaid에서 렌더링.
 - [x] Step 3: 전체 테스트·git diff --check·비밀 파일 검사·V1~V3 diff 검증.
   Expected: 전체 통과, 기존 migration diff 없음.
-- [ ] Step 4: 새 검토자가 전체 diff와 spec/plan을 검토. 중요한 문제는 회귀 테스트 후 수정하고 전체 suite 실행.
+- [x] Step 4: 새 검토자가 전체 diff와 spec/plan을 검토. 중요한 문제는 회귀 테스트 후 수정하고 전체 suite 실행.
 - [ ] Step 5: 문서와 최종 변경 커밋 후 `git push -u origin Loe/db-design`.
   Expected: 원격 브랜치와 로컬 HEAD SHA 일치; main/develop 변경 없음.
